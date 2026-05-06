@@ -101,6 +101,29 @@ const SheetsAPI = {
     }
   },
 
+  // Generate a shareable config link that encodes the Sheets URLs
+  getShareLink() {
+    const webUrl = this.getWebAppUrl();
+    const spreadUrl = this.getSpreadsheetUrl();
+    if (!webUrl) return null;
+    const config = btoa(JSON.stringify({ w: webUrl, s: spreadUrl }));
+    return window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + 'siswa.html#cfg=' + config;
+  },
+
+  // Load config from URL hash if present (call on page load)
+  loadFromHash() {
+    const hash = window.location.hash;
+    if (!hash.startsWith('#cfg=')) return false;
+    try {
+      const config = JSON.parse(atob(hash.slice(5)));
+      if (config.w) { this.setWebAppUrl(config.w); }
+      if (config.s) { this.setSpreadsheetUrl(config.s); }
+      // Clean hash from URL without reload
+      history.replaceState(null, '', window.location.pathname);
+      return true;
+    } catch(e) { return false; }
+  },
+
   // JSONP helper — bypass CORS untuk Apps Script dari file lokal
   _fetchJsonp(url) {
     return new Promise((resolve, reject) => {

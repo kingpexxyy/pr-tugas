@@ -2,6 +2,9 @@
 const currentUser = JSON.parse(sessionStorage.getItem('user') || 'null');
 if (!currentUser || currentUser.role !== 'siswa') window.location.href = 'index.html';
 
+// Load Sheets config from URL hash if shared via link
+SheetsAPI.loadFromHash();
+
 // ===== STATE =====
 let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
 let submissions = JSON.parse(localStorage.getItem('submissions') || '[]');

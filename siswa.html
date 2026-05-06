@@ -9,6 +9,37 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<!-- MOBILE TOP BAR -->
+<div class="mobile-topbar">
+  <span style="font-size:1.2rem">📚</span>
+  <span class="brand-name">TugasKu</span>
+  <div class="topbar-actions">
+    <button class="topbar-btn" onclick="toggleDark()" title="Mode Gelap"><span id="darkIconMobile">🌙</span></button>
+    <button class="topbar-btn" onclick="logout()" title="Keluar">🚪</button>
+  </div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <button class="mobile-nav-item active" id="mn-dashboard" onclick="showPage('dashboard',null);setMobileNav('dashboard')">
+      <span class="mn-icon">🏠</span><span>Home</span>
+    </button>
+    <button class="mobile-nav-item" id="mn-tugas" onclick="showPage('tugas',null);setMobileNav('tugas')">
+      <span class="mn-icon">📋</span><span>Tugas</span>
+    </button>
+    <button class="mobile-nav-item" id="mn-jadwalku" onclick="showPage('jadwalku',null);setMobileNav('jadwalku')">
+      <span class="mn-icon">📝</span><span>Jadwal</span>
+    </button>
+    <button class="mobile-nav-item" id="mn-kalender" onclick="showPage('kalender',null);setMobileNav('kalender')">
+      <span class="mn-icon">📅</span><span>Kalender</span>
+    </button>
+    <button class="mobile-nav-item" id="mn-profil" onclick="showPage('profil',null);setMobileNav('profil')">
+      <span class="mn-icon">👤</span><span>Profil</span>
+    </button>
+  </div>
+</nav>
+
 <div class="dashboard">
   <aside class="sidebar">
     <div class="brand">
@@ -224,6 +255,18 @@
 
 <div class="toast" id="toast"></div>
 <script src="sheets.js"></script>
+<script>
+function setMobileNav(page) {
+  document.querySelectorAll('.mobile-nav-item').forEach(b => b.classList.remove('active'));
+  const el = document.getElementById('mn-' + page);
+  if (el) el.classList.add('active');
+  // sync dark icon
+  const mi = document.getElementById('darkIconMobile');
+  if (mi) mi.textContent = localStorage.getItem('darkMode') === '1' ? '☀️' : '🌙';
+}
+// Override toggleDark to also update mobile icon
+const _origToggleDark = window.toggleDark;
+</script>
 <script src="siswa.js"></script>
 </body>
 </html>

@@ -320,3 +320,148 @@ body.dark .global-search-bar input{background:#0f172a}
 body.dark .deadline-banner{background:linear-gradient(135deg,#451a03,#78350f);border-color:#92400e}
 body.dark .deadline-banner .banner-text strong{color:#fbbf24}
 body.dark .deadline-banner .banner-text span{color:#fcd34d}
+
+/* ===== MOBILE BOTTOM NAV ===== */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(180deg,#1e1b4b,#312e81);
+  z-index: 200;
+  padding: 0 4px env(safe-area-inset-bottom,8px);
+  box-shadow: 0 -4px 20px rgba(0,0,0,.2);
+}
+.mobile-nav-inner {
+  display: flex;
+  justify-content: space-around;
+  align-items: stretch;
+}
+.mobile-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px 6px;
+  color: rgba(255,255,255,.5);
+  font-size: .6rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  gap: 3px;
+  transition: color .2s;
+  text-decoration: none;
+  min-height: 56px;
+}
+.mobile-nav-item .mn-icon { font-size: 1.3rem; line-height: 1; }
+.mobile-nav-item.active { color: #fff; }
+.mobile-nav-item.active .mn-icon { filter: drop-shadow(0 0 6px rgba(255,255,255,.5)); }
+
+/* Mobile top bar */
+.mobile-topbar {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 56px;
+  background: linear-gradient(135deg,#1e1b4b,#4c1d95);
+  z-index: 150;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.2);
+}
+.mobile-topbar .brand-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  flex: 1;
+}
+.mobile-topbar .topbar-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.mobile-topbar .topbar-btn {
+  width: 36px; height: 36px;
+  background: rgba(255,255,255,.12);
+  border: none; border-radius: 10px;
+  color: #fff; font-size: 1rem;
+  cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+}
+
+/* Mobile FAB (floating action button) for guru add task */
+.mobile-fab {
+  display: none;
+  position: fixed;
+  bottom: 72px; right: 20px;
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg,#6366f1,#4f46e5);
+  border-radius: 50%;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(99,102,241,.5);
+  z-index: 190;
+  align-items: center;
+  justify-content: center;
+  transition: transform .2s;
+}
+.mobile-fab:active { transform: scale(.92); }
+
+@media(max-width:768px) {
+  :root { --sidebar-w: 0px; }
+  .sidebar { display: none !important; }
+  .mobile-nav { display: block; }
+  .mobile-topbar { display: flex; }
+  .main-content {
+    margin-left: 0;
+    padding: 72px 16px 80px;
+  }
+  /* Stack stats 2x2 on mobile */
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .stat-card { padding: 16px 14px; }
+  .stat-card .stat-value { font-size: 1.6rem; }
+  /* Single column task cards */
+  .task-grid { grid-template-columns: 1fr; gap: 12px; }
+  /* Full width modal */
+  .modal-overlay { padding: 12px; align-items: flex-end; }
+  .modal {
+    border-radius: 20px 20px 0 0;
+    max-height: 85vh;
+    padding: 24px 20px;
+  }
+  .modal-wide { max-width: 100%; }
+  /* Page header compact */
+  .page-header h1 { font-size: 1.3rem; }
+  /* Hide search bar in header on mobile (use topbar search) */
+  .page-header .global-search-bar { display: none; }
+  /* Calendar full width */
+  #page-kalender > div { grid-template-columns: 1fr !important; }
+  /* Stats layout for dashboard urgent section */
+  #page-dashboard > div:nth-child(4) { grid-template-columns: 1fr !important; }
+  /* Table scroll */
+  .table-container { overflow-x: auto; }
+  table { min-width: 600px; }
+  /* Toast bottom offset for nav */
+  .toast { bottom: 76px; right: 16px; left: 16px; max-width: none; }
+  /* Filter bar stack */
+  .filter-bar { flex-direction: column; }
+  .filter-bar input { min-width: unset; }
+  /* Profile card full width */
+  .profile-card { max-width: 100%; }
+  /* Sheets config */
+  .sheets-config { padding: 18px; }
+  /* Section header */
+  .section-header h2 { font-size: .95rem; }
+}
+
+body.dark .mobile-nav { background: linear-gradient(180deg,#020617,#0f172a); }
+body.dark .mobile-topbar { background: linear-gradient(135deg,#020617,#1e1b4b); }

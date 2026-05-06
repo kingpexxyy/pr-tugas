@@ -9,6 +9,40 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<!-- MOBILE TOP BAR -->
+<div class="mobile-topbar">
+  <span style="font-size:1.2rem">📚</span>
+  <span class="brand-name">TugasKu</span>
+  <div class="topbar-actions">
+    <button class="topbar-btn" onclick="toggleDark()" title="Mode Gelap"><span id="darkIconMobile">🌙</span></button>
+    <button class="topbar-btn" onclick="logout()" title="Keluar">🚪</button>
+  </div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <button class="mobile-nav-item active" id="mn-dashboard" onclick="showPage('dashboard',null);setMobileNav('dashboard')">
+      <span class="mn-icon">🏠</span><span>Home</span>
+    </button>
+    <button class="mobile-nav-item" id="mn-tugas" onclick="showPage('tugas',null);setMobileNav('tugas')">
+      <span class="mn-icon">📋</span><span>Tugas</span>
+    </button>
+    <button class="mobile-nav-item" id="mn-pengumpulan" onclick="showPage('pengumpulan',null);setMobileNav('pengumpulan')">
+      <span class="mn-icon">📥</span><span>Kumpul</span>
+    </button>
+    <button class="mobile-nav-item" id="mn-statistik" onclick="showPage('statistik',null);setMobileNav('statistik')">
+      <span class="mn-icon">📊</span><span>Statistik</span>
+    </button>
+    <button class="mobile-nav-item" id="mn-pengaturan" onclick="showPage('pengaturan',null);setMobileNav('pengaturan')">
+      <span class="mn-icon">⚙️</span><span>Pengaturan</span>
+    </button>
+  </div>
+</nav>
+
+<!-- FAB: Tambah Tugas -->
+<button class="mobile-fab" id="mobileFab" onclick="openAddModal()" style="display:flex">➕</button>
+
 <div class="dashboard">
   <aside class="sidebar">
     <div class="brand">
@@ -245,6 +279,18 @@
 
 <div class="toast" id="toast"></div>
 <script src="sheets.js"></script>
+<script>
+function setMobileNav(page) {
+  document.querySelectorAll('.mobile-nav-item').forEach(b => b.classList.remove('active'));
+  const el = document.getElementById('mn-' + page);
+  if (el) el.classList.add('active');
+  // Show/hide FAB only on tugas page
+  const fab = document.getElementById('mobileFab');
+  if (fab) fab.style.display = (page === 'tugas' || page === 'dashboard') ? 'flex' : 'none';
+  const mi = document.getElementById('darkIconMobile');
+  if (mi) mi.textContent = localStorage.getItem('darkMode') === '1' ? '☀️' : '🌙';
+}
+</script>
 <script src="guru.js"></script>
 </body>
 </html>
