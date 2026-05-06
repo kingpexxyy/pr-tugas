@@ -850,3 +850,241 @@ body.dark .online-avatar { background: var(--primary-light); border-color: var(-
     font-size: 16px !important;
   }
 }
+
+/* ============================================================
+   APPLE-STYLE ANIMATIONS
+   Spring physics: cubic-bezier(.34,1.56,.64,1) = spring overshoot
+   Ease out expo: cubic-bezier(.16,1,.3,1) = fast start, smooth stop
+   ============================================================ */
+
+/* ── Keyframes ── */
+@keyframes springIn {
+  0%   { opacity:0; transform:scale(.85) translateY(12px); }
+  60%  { opacity:1; transform:scale(1.03) translateY(-2px); }
+  100% { transform:scale(1) translateY(0); }
+}
+@keyframes springInUp {
+  0%   { opacity:0; transform:translateY(24px) scale(.96); }
+  60%  { opacity:1; transform:translateY(-4px) scale(1.01); }
+  100% { transform:translateY(0) scale(1); }
+}
+@keyframes springInDown {
+  0%   { opacity:0; transform:translateY(-20px) scale(.97); }
+  100% { opacity:1; transform:translateY(0) scale(1); }
+}
+@keyframes fadeBlur {
+  from { opacity:0; filter:blur(8px); transform:scale(.97); }
+  to   { opacity:1; filter:blur(0); transform:scale(1); }
+}
+@keyframes slideInRight {
+  from { opacity:0; transform:translateX(20px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+@keyframes bounceIn {
+  0%   { opacity:0; transform:scale(.3); }
+  50%  { opacity:1; transform:scale(1.08); }
+  70%  { transform:scale(.95); }
+  100% { transform:scale(1); }
+}
+@keyframes shimmerSlide {
+  0%   { background-position:-200% 0; }
+  100% { background-position:200% 0; }
+}
+@keyframes floatUp {
+  0%,100% { transform:translateY(0); }
+  50%     { transform:translateY(-6px); }
+}
+@keyframes glowPulse {
+  0%,100% { box-shadow:0 0 0 0 rgba(99,102,241,.4); }
+  50%     { box-shadow:0 0 0 8px rgba(99,102,241,0); }
+}
+
+/* ── Page transitions ── */
+.page {
+  animation: springInUp .45s cubic-bezier(.16,1,.3,1) both;
+}
+
+/* ── Auth card ── */
+.auth-card {
+  animation: springIn .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+
+/* ── Stat cards — staggered spring ── */
+.stat-card {
+  animation: springInUp .5s cubic-bezier(.34,1.56,.64,1) both;
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1),
+              box-shadow .3s cubic-bezier(.16,1,.3,1),
+              background-color .4s ease;
+}
+.stat-card:nth-child(1) { animation-delay:.04s; }
+.stat-card:nth-child(2) { animation-delay:.08s; }
+.stat-card:nth-child(3) { animation-delay:.12s; }
+.stat-card:nth-child(4) { animation-delay:.16s; }
+.stat-card:hover { transform:translateY(-5px) scale(1.02); }
+.stat-card:active { transform:scale(.97); transition-duration:.1s; }
+
+/* ── Task cards ── */
+.task-card {
+  animation: springInUp .4s cubic-bezier(.34,1.56,.64,1) both;
+  transition: transform .35s cubic-bezier(.34,1.56,.64,1),
+              box-shadow .3s cubic-bezier(.16,1,.3,1),
+              background-color .4s ease,
+              border-color .3s ease;
+}
+.task-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 16px 48px rgba(0,0,0,.14);
+}
+.task-card:active { transform:scale(.97) translateY(0); transition-duration:.1s; }
+
+/* ── Buttons — spring press ── */
+.btn {
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1),
+              box-shadow .25s cubic-bezier(.16,1,.3,1),
+              background .3s ease,
+              opacity .2s ease;
+}
+.btn:hover { transform:translateY(-2px) scale(1.02); }
+.btn:active { transform:scale(.94) translateY(1px); transition-duration:.08s; }
+.btn-primary:hover { box-shadow:0 8px 24px rgba(99,102,241,.45); }
+.btn-danger:hover  { box-shadow:0 8px 24px rgba(239,68,68,.4); }
+.btn-success:hover { box-shadow:0 8px 24px rgba(16,185,129,.4); }
+
+/* ── Modal — spring from bottom ── */
+.modal-overlay { transition:background .3s ease, backdrop-filter .3s ease; }
+.modal-overlay.open .modal {
+  animation: springInUp .45s cubic-bezier(.34,1.56,.64,1) both;
+}
+@media(max-width:768px) {
+  .modal-overlay.open .modal {
+    animation: slideInFromBottom .4s cubic-bezier(.16,1,.3,1) both;
+  }
+}
+@keyframes slideInFromBottom {
+  from { transform:translateY(100%); opacity:.8; }
+  to   { transform:translateY(0); opacity:1; }
+}
+
+/* ── Sidebar nav links ── */
+.sidebar nav a {
+  transition: background .2s cubic-bezier(.16,1,.3,1),
+              color .2s ease,
+              transform .25s cubic-bezier(.34,1.56,.64,1),
+              padding-left .2s ease;
+}
+.sidebar nav a:hover { transform:translateX(4px); }
+.sidebar nav a.active { transform:translateX(4px); }
+
+/* ── Mobile nav items ── */
+.mobile-nav-item {
+  transition: color .2s ease, transform .2s cubic-bezier(.34,1.56,.64,1);
+}
+.mobile-nav-item:active { transform:scale(.82); transition-duration:.08s; }
+.mobile-nav-item.active .mn-icon {
+  animation: bounceIn .4s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* ── FAB ── */
+.mobile-fab {
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1),
+              box-shadow .3s cubic-bezier(.16,1,.3,1);
+  animation: springIn .5s cubic-bezier(.34,1.56,.64,1) .2s both;
+}
+.mobile-fab:hover { transform:scale(1.12) rotate(45deg); }
+.mobile-fab:active { transform:scale(.88); transition-duration:.08s; }
+
+/* ── Toast ── */
+.toast {
+  transition: transform .4s cubic-bezier(.34,1.56,.64,1),
+              opacity .3s ease;
+}
+.toast.show { transform:translateY(0) scale(1); }
+
+/* ── Search results ── */
+.search-results.open {
+  animation: springInDown .3s cubic-bezier(.34,1.56,.64,1);
+}
+.search-result-item {
+  transition: background .15s ease, transform .2s cubic-bezier(.34,1.56,.64,1);
+}
+.search-result-item:hover { transform:translateX(3px); }
+
+/* ── Activity items ── */
+.activity-item {
+  animation: slideInRight .35s cubic-bezier(.16,1,.3,1) both;
+}
+
+/* ── Dashboard topbar clock ── */
+.clock-time {
+  transition: color .3s ease;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Online avatars ── */
+.online-avatar {
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1), z-index 0s;
+}
+.online-avatar:hover { transform:translateY(-4px) scale(1.15); }
+
+/* ── Progress bars ── */
+.progress-fill {
+  transition: width .8s cubic-bezier(.16,1,.3,1);
+}
+
+/* ── Badges ── */
+.badge {
+  transition: transform .2s cubic-bezier(.34,1.56,.64,1), background .3s ease;
+}
+
+/* ── Form inputs — focus spring ── */
+.form-group input,
+.form-group select,
+.form-group textarea {
+  transition: border-color .25s ease,
+              box-shadow .3s cubic-bezier(.16,1,.3,1),
+              transform .2s cubic-bezier(.34,1.56,.64,1),
+              background .3s ease;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  transform: scale(1.005);
+}
+
+/* ── Dark mode transition — smooth fade ── */
+body {
+  transition: background-color .4s cubic-bezier(.16,1,.3,1),
+              color .3s ease;
+}
+.stat-card, .task-card, .modal, .auth-card, .profile-card,
+.sheets-config, .table-container, .mini-calendar,
+.filter-bar input, .filter-bar select,
+.form-group input, .form-group select, .form-group textarea,
+.search-results, .deadline-banner, .notif-banner,
+.sidebar, .mobile-topbar, .mobile-nav, .dashboard-topbar {
+  transition: background-color .4s cubic-bezier(.16,1,.3,1),
+              color .3s ease,
+              border-color .3s ease,
+              box-shadow .3s ease;
+}
+
+/* ── Streak card float ── */
+.streak-card .streak-num {
+  display: inline-block;
+  animation: floatUp 3s ease-in-out infinite;
+}
+
+/* ── Primary button glow on focus ── */
+.btn-primary:focus-visible {
+  animation: glowPulse 1.5s ease infinite;
+}
+
+/* ── Shimmer on skeleton ── */
+.skeleton {
+  background: linear-gradient(90deg,
+    var(--border) 25%,
+    rgba(255,255,255,.3) 50%,
+    var(--border) 75%);
+  background-size: 200% 100%;
+  animation: shimmerSlide 1.8s ease infinite;
+}
