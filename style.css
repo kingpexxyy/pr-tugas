@@ -261,7 +261,8 @@ body.dark .toggle-switch::after{transform:translateX(16px)}
 .mini-calendar .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
 .mini-calendar .cal-day-name{text-align:center;font-size:.7rem;font-weight:700;color:var(--text-muted);padding:4px 0;text-transform:uppercase}
 .mini-calendar .cal-day{text-align:center;padding:6px 2px;font-size:.8rem;border-radius:8px;cursor:default;position:relative;transition:background .15s}
-.mini-calendar .cal-day.today{background:var(--primary);color:#fff;font-weight:700}
+.mini-calendar .cal-day.today{background:var(--primary);color:#fff !important;font-weight:700;box-shadow:0 2px 8px rgba(99,102,241,.5)}
+.mini-calendar .cal-day.today::after{background:#fff !important}
 .mini-calendar .cal-day.has-task{font-weight:700;color:var(--primary)}
 .mini-calendar .cal-day.has-task::after{content:'';position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:4px;height:4px;background:var(--primary);border-radius:50%}
 .mini-calendar .cal-day.other-month{color:var(--border)}
