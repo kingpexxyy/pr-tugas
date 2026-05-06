@@ -329,9 +329,26 @@ function openTaskDetail(id) {
   document.getElementById('detailDeleteBtn').onclick = () => deleteTask(id);
   document.getElementById('taskDetailModal').classList.add('open');
 }
-function closeDetailModal() { document.getElementById('taskDetailModal').classList.remove('open'); }
+// ===== MODAL CLOSE HELPER =====
+function closeModalAnimated(id, callback) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('closing');
+  setTimeout(() => {
+    el.classList.remove('open', 'closing');
+    if (callback) callback();
+  }, 280);
+}
 
-// ===== TASK TABLE =====
+function closeDetailModal() { closeModalAnimated('taskDetailModal'); }
+function closeModal() {
+  closeModalAnimated('addTaskModal', () => {
+    document.getElementById('addTaskModal').querySelector('form').reset();
+  });
+}
+function closeFeedbackModal() {
+  closeModalAnimated('feedbackModal', () => { currentFeedbackSub = null; });
+}
 function renderTaskTable() {
   const search = document.getElementById('searchTugas').value.toLowerCase();
   const mapel = document.getElementById('filterMapel').value;
@@ -388,10 +405,8 @@ function openAddModal() {
   document.getElementById('taskDeadline').min = now.toISOString().slice(0, 16);
   document.getElementById('addTaskModal').classList.add('open');
 }
-function closeModal() {
-  document.getElementById('addTaskModal').classList.remove('open');
-  document.getElementById('addTaskModal').querySelector('form').reset();
-}
+// Remove old individual close functions — replaced by closeModalAnimated above
+
 async function submitTask(e) {
   e.preventDefault();
   const task = {
@@ -473,7 +488,7 @@ function openFeedbackModal(subId) {
   document.getElementById('feedbackText').value = fb ? fb.text : '';
   document.getElementById('feedbackModal').classList.add('open');
 }
-function closeFeedbackModal() { document.getElementById('feedbackModal').classList.remove('open'); currentFeedbackSub = null; }
+
 function saveFeedback() {
   const text = document.getElementById('feedbackText').value.trim();
   if (!text) { showToast('Tulis feedback dulu', 'error'); return; }
@@ -726,5 +741,7 @@ function logout() { sessionStorage.removeItem('user'); window.location.href = 'i
 
 ['addTaskModal','taskDetailModal','feedbackModal'].forEach(id => {
   const el = document.getElementById(id);
-  if (el) el.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+  if (el) el.addEventListener('click', function(e) {
+    if (e.target === this) closeModalAnimated(id);
+  });
 });

@@ -1088,3 +1088,26 @@ body {
   background-size: 200% 100%;
   animation: shimmerSlide 1.8s ease infinite;
 }
+
+/* ── Modal close animation ── */
+@keyframes slideOutDown {
+  from { transform:translateY(0); opacity:1; }
+  to   { transform:translateY(100%); opacity:.6; }
+}
+@keyframes scaleOutFade {
+  from { transform:scale(1) translateY(0); opacity:1; }
+  to   { transform:scale(.92) translateY(16px); opacity:0; }
+}
+
+.modal-overlay.closing { pointer-events:none; }
+.modal-overlay.closing .modal {
+  animation: scaleOutFade .25s cubic-bezier(.4,0,1,1) forwards;
+}
+@media(max-width:768px) {
+  .modal-overlay.closing .modal {
+    animation: slideOutDown .3s cubic-bezier(.4,0,1,1) forwards;
+  }
+}
+.modal-overlay.closing {
+  animation: fadeIn .25s ease reverse forwards;
+}

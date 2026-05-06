@@ -440,7 +440,7 @@ function openTaskDetail(id) {
   }
   document.getElementById('taskDetailModal').classList.add('open');
 }
-function closeTaskDetail() { document.getElementById('taskDetailModal').classList.remove('open'); }
+function closeTaskDetail() { closeModalAnimated('taskDetailModal'); }
 
 // ===== SUBMIT =====
 let selectedFile = null;
@@ -463,7 +463,7 @@ function openSubmitModal(taskId) {
     </div>`;
   document.getElementById('submitModal').classList.add('open');
 }
-function closeSubmitModal() { document.getElementById('submitModal').classList.remove('open'); }
+function closeSubmitModal() { closeModalAnimated('submitModal'); }
 function handleFileSelect(input) {
   if (input.files[0]) { selectedFile = input.files[0]; document.getElementById('fileLabel').textContent = `📄 ${selectedFile.name}`; }
 }
@@ -553,14 +553,18 @@ function openPersonalDetail(id) {
   `;
   document.getElementById('personalDetailModal').classList.add('open');
 }
-function closePersonalDetail() { document.getElementById('personalDetailModal').classList.remove('open'); }
+function closePersonalDetail() { closeModalAnimated('personalDetailModal'); }
 
 function openAddPersonalModal() {
   const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
   document.getElementById('personalDeadline').min = now.toISOString().slice(0, 16);
   document.getElementById('addPersonalModal').classList.add('open');
 }
-function closePersonalModal() { document.getElementById('addPersonalModal').classList.remove('open'); document.getElementById('addPersonalModal').querySelector('form').reset(); }
+function closePersonalModal() {
+  closeModalAnimated('addPersonalModal', () => {
+    document.getElementById('addPersonalModal').querySelector('form').reset();
+  });
+}
 
 function submitPersonalTask(e) {
   e.preventDefault();
@@ -781,6 +785,17 @@ function initPresence() {
   });
 }
 
+// ===== MODAL CLOSE HELPER =====
+function closeModalAnimated(id, callback) {
+  const el = document.getElementById(id);
+  if (!el || !el.classList.contains('open')) return;
+  el.classList.add('closing');
+  setTimeout(() => {
+    el.classList.remove('open', 'closing');
+    if (callback) callback();
+  }, 280);
+}
+
 // ===== HELPERS =====
 function savePersonalTasks() { localStorage.setItem('personalTasks_' + currentUser.username, JSON.stringify(personalTasks)); }
 function formatDate(d) { return new Date(d).toLocaleString('id-ID', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }); }
@@ -792,5 +807,7 @@ function logout() { sessionStorage.removeItem('user'); window.location.href = 'i
 
 ['taskDetailModal','submitModal','addPersonalModal','personalDetailModal'].forEach(id => {
   const el = document.getElementById(id);
-  if (el) el.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+  if (el) el.addEventListener('click', function(e) {
+    if (e.target === this) closeModalAnimated(id);
+  });
 });
