@@ -308,6 +308,15 @@ body.dark{
   --primary-light:#1e1b4b;--success-light:#064e3b;
   --danger-light:#450a0a;--warning-light:#451a03;--purple-light:#2e1065;
 }
+/* Dark mode badge text — force readable contrast */
+body.dark .badge-overdue { background:#7f1d1d; color:#fca5a5; }
+body.dark .badge-submitted { background:#064e3b; color:#6ee7b7; }
+body.dark .badge-pending { background:#451a03; color:#fcd34d; }
+body.dark .badge-graded { background:#1e1b4b; color:#a5b4fc; }
+body.dark .task-card .deadline-chip.urgent { background:#7f1d1d; color:#fca5a5; }
+body.dark .task-card .deadline-chip.warning { background:#451a03; color:#fcd34d; }
+body.dark .task-card .deadline-chip.ok { background:#064e3b; color:#6ee7b7; }
+body.dark .est-chip { background:#451a03; color:#fcd34d; }
 body.dark .sidebar{background:linear-gradient(180deg,#020617 0%,#0f172a 100%)}
 body.dark .auth-card{background:#1e293b}
 body.dark .form-group input,body.dark .form-group select,body.dark .form-group textarea{background:#0f172a;color:var(--text);border-color:var(--border)}
