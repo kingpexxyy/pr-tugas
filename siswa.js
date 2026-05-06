@@ -66,10 +66,12 @@ function initFirebaseListeners() {
 
 if (window._fbReady) {
   initFirebaseListeners();
+  initPresence();
 } else {
-  document.addEventListener('firebase-ready', initFirebaseListeners);
+  document.addEventListener('firebase-ready', () => { initFirebaseListeners(); initPresence(); });
 }
 
+startClock();
 requestNotifPermission();
 startCountdownTimers();
 
@@ -668,6 +670,55 @@ function importDataSiswa(input) {
   };
   reader.readAsText(file);
   input.value = '';
+}
+
+// ===== CLOCK =====
+function startClock() {
+  const days = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+  function tick() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2,'0');
+    const m = String(now.getMinutes()).padStart(2,'0');
+    const s = String(now.getSeconds()).padStart(2,'0');
+    const el = document.getElementById('clockTime');
+    if (el) el.textContent = `${h}:${m}:${s}`;
+    const dateEl = document.getElementById('clockDate');
+    if (dateEl) dateEl.textContent = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+  }
+  tick();
+  setInterval(tick, 1000);
+}
+
+// ===== PRESENCE (online users) =====
+function initPresence() {
+  if (!window._fbDB) return;
+  const sessionId = Date.now().toString(36) + Math.random().toString(36).slice(2);
+  const presenceRef = window._fbRef(window._fbDB, `presence/${sessionId}`);
+  const userData = {
+    name: currentUser.name,
+    role: currentUser.role,
+    username: currentUser.username,
+    joinedAt: new Date().toISOString()
+  };
+  window._fbSet(presenceRef, userData);
+  window._fbOnDisconnect(presenceRef).remove();
+  window.addEventListener('beforeunload', () => window._fbSet(presenceRef, null));
+
+  window._fbOnValue(window._fbRef(window._fbDB, 'presence'), snap => {
+    const data = snap.val() || {};
+    const users = Object.values(data);
+    const countEl = document.getElementById('onlineCount');
+    const avatarsEl = document.getElementById('onlineAvatars');
+    if (countEl) countEl.textContent = users.length;
+    if (avatarsEl) {
+      avatarsEl.innerHTML = users.slice(0, 5).map(u => {
+        const emoji = u.role === 'guru' ? '👨‍🏫' : '🎒';
+        const isMe = u.username === currentUser.username;
+        return `<div class="online-avatar ${isMe ? 'me' : ''}" title="${u.name} (${u.role})">${emoji}</div>`;
+      }).join('') + (users.length > 5 ? `<div class="online-avatar-more">+${users.length - 5}</div>` : '');
+    }
+  });
 }
 
 // ===== HELPERS =====

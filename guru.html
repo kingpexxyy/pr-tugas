@@ -78,6 +78,19 @@
 
     <!-- DASHBOARD -->
     <div id="page-dashboard" class="page">
+      <!-- Clock + Online Users Bar -->
+      <div class="dashboard-topbar">
+        <div class="clock-widget">
+          <div class="clock-time" id="clockTime">--:--:--</div>
+          <div class="clock-date" id="clockDate">--</div>
+        </div>
+        <div class="online-users" id="onlineUsers">
+          <span class="online-dot"></span>
+          <span id="onlineCount">0</span> online
+          <div class="online-avatars" id="onlineAvatars"></div>
+        </div>
+      </div>
+
       <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start">
         <div>
           <h1>Selamat datang, <span id="guruName">-</span> 👋</h1>
@@ -284,7 +297,7 @@
 <script src="sheets.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, remove, onValue, push, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, set, remove, onValue, push, get, onDisconnect, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 const _app = initializeApp({
   apiKey:"AIzaSyA-Y0tDvkRx2AErra1obZ6IG9PoLfrRVUA",
   authDomain:"tugas-68ece.firebaseapp.com",
@@ -302,6 +315,8 @@ window._fbRemove = remove;
 window._fbOnValue = onValue;
 window._fbPush = push;
 window._fbGet = get;
+window._fbOnDisconnect = onDisconnect;
+window._fbServerTimestamp = serverTimestamp;
 // Signal that Firebase is ready
 window._fbReady = true;
 document.dispatchEvent(new Event('firebase-ready'));

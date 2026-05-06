@@ -75,6 +75,19 @@
 
     <!-- DASHBOARD -->
     <div id="page-dashboard" class="page">
+      <!-- Clock + Online Users Bar -->
+      <div class="dashboard-topbar">
+        <div class="clock-widget">
+          <div class="clock-time" id="clockTime">--:--:--</div>
+          <div class="clock-date" id="clockDate">--</div>
+        </div>
+        <div class="online-users" id="onlineUsers">
+          <span class="online-dot"></span>
+          <span id="onlineCount">0</span> online
+          <div class="online-avatars" id="onlineAvatars"></div>
+        </div>
+      </div>
+
       <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start">
         <div>
           <h1>Halo, <span id="siswaName">-</span> 👋</h1>
@@ -265,7 +278,7 @@
 <script src="sheets.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, set, onValue, onDisconnect, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 const _app = initializeApp({
   apiKey:"AIzaSyA-Y0tDvkRx2AErra1obZ6IG9PoLfrRVUA",
   authDomain:"tugas-68ece.firebaseapp.com",
@@ -280,6 +293,8 @@ window._fbDB = _db;
 window._fbRef = ref;
 window._fbSet = set;
 window._fbOnValue = onValue;
+window._fbOnDisconnect = onDisconnect;
+window._fbServerTimestamp = serverTimestamp;
 window._fbReady = true;
 document.dispatchEvent(new Event('firebase-ready'));
 </script>
