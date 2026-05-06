@@ -491,23 +491,13 @@ body { transition: background-color .35s ease, color .25s ease; }
     border-radius: 24px 24px 0 0;
     max-height: 88vh;
     height: auto;
-    padding: 20px 18px 36px;
+    padding: 20px 18px 80px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
-    touch-action: pan-y;
   }
   .modal-wide { max-width: 100%; }
-  /* Modal actions always visible at bottom */
-  .modal .modal-actions {
-    position: sticky;
-    bottom: 0;
-    background: var(--card);
-    padding: 12px 0 0;
-    margin-top: 16px;
-    z-index: 1;
-  }
-  body.dark .modal .modal-actions { background: #1e293b; }
+  .modal .modal-actions { position: static; margin-top: 16px; padding: 0; }
   /* Page header compact */
   .page-header h1 { font-size: 1.3rem; }
   /* Hide search bar in header on mobile (use topbar search) */
