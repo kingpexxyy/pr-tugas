@@ -4,7 +4,7 @@
  * Sheet otomatis dibuat per siswa saat pertama kali kumpul tugas.
  */
 
-const SHEETS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwWCz-5Shp843L2S3JMuBQoG8d0BqwgLXFyEor3fU10OfmptbRyX9H0dTXJguRX9N4_Vw/exec';
+const SHEETS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwh9xak9ZZGtmJUEdr69nOOMgFpf6vj8jFhdYhL9wcBGlyDWcKA2Jn8imToNK96SyMEaA/exec';
 const SHEETS_SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/1ouPIpyzGLQgyXM9zlDjLe6MWZjE7mBeav7n2ZpDyuEY/edit';
 
 const SheetsAPI = {
