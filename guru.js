@@ -274,14 +274,16 @@ function renderTaskTable() {
     return `
       <tr style="cursor:pointer" onclick="openTaskDetail('${t.id}')">
         <td><strong>${t.title}</strong><br><span style="font-size:0.78rem;color:var(--text-muted)">${t.description.substring(0, 50)}…</span></td>
-        <td><span class="badge badge-graded">${t.subject}</span></td>
-        <td style="font-size:0.85rem">${formatDate(t.deadline)}</td>
-        <td style="min-width:130px">
-          <div class="progress-label" style="font-size:0.75rem"><span>${cnt}/${totalSiswa}</span><span>${pct}%</span></div>
-          <div class="progress-bar" style="margin-top:4px"><div class="progress-fill" style="width:${pct}%;background:${color}"></div></div>
+        <td data-label="Mapel"><span class="badge badge-graded">${t.subject}</span></td>
+        <td data-label="Tenggat" style="font-size:0.85rem">${formatDate(t.deadline)}</td>
+        <td data-label="Progress">
+          <div style="flex:1">
+            <div class="progress-label" style="font-size:0.75rem"><span>${cnt}/${totalSiswa}</span><span>${pct}%</span></div>
+            <div class="progress-bar" style="margin-top:4px"><div class="progress-fill" style="width:${pct}%;background:${color}"></div></div>
+          </div>
         </td>
-        <td>${isOverdue ? '<span class="badge badge-overdue">Lewat</span>' : '<span class="badge badge-pending">Aktif</span>'}</td>
-        <td onclick="event.stopPropagation()"><button class="btn btn-danger btn-sm" onclick="deleteTask('${t.id}')">🗑️</button></td>
+        <td data-label="Status">${isOverdue ? '<span class="badge badge-overdue">Lewat</span>' : '<span class="badge badge-pending">Aktif</span>'}</td>
+        <td data-label="" onclick="event.stopPropagation()"><button class="btn btn-danger btn-sm" onclick="deleteTask('${t.id}')">🗑️ Hapus</button></td>
       </tr>`;
   }).join('');
 }
@@ -367,14 +369,13 @@ function renderSubmissions() {
     const fb = feedbacks.find(f => f.subId === s.id);
     return `
       <tr>
-        <td><strong>${s.studentName}</strong></td>
-        <td>${s.studentClass}</td>
-        <td>${task ? task.title : '-'}</td>
-        <td>${task ? task.subject : '-'}</td>
-        <td style="font-size:0.85rem">${formatDate(s.submittedAt)}</td>
-        <td>${isLate ? '<span class="badge badge-overdue">Terlambat</span>' : '<span class="badge badge-submitted">Tepat Waktu</span>'}</td>
-        <td style="font-size:0.85rem;color:var(--text-muted)">${s.note || '—'}</td>
-        <td>${fb ? `<span class="feedback-chip" onclick="openFeedbackModal('${s.id}')">💬 Edit</span>` : `<span class="feedback-chip" onclick="openFeedbackModal('${s.id}')">+ Feedback</span>`}</td>
+        <td><strong>${s.studentName}</strong> <span style="font-size:.78rem;color:var(--text-muted)">${s.studentClass}</span></td>
+        <td data-label="Tugas">${task ? task.title : '-'}</td>
+        <td data-label="Mapel">${task ? task.subject : '-'}</td>
+        <td data-label="Waktu Kumpul" style="font-size:0.85rem">${formatDate(s.submittedAt)}</td>
+        <td data-label="Status">${isLate ? '<span class="badge badge-overdue">Terlambat</span>' : '<span class="badge badge-submitted">Tepat Waktu</span>'}</td>
+        <td data-label="Catatan" style="font-size:0.85rem;color:var(--text-muted)">${s.note || '—'}</td>
+        <td data-label="Feedback">${fb ? `<span class="feedback-chip" onclick="openFeedbackModal('${s.id}')">💬 Edit</span>` : `<span class="feedback-chip" onclick="openFeedbackModal('${s.id}')">+ Feedback</span>`}</td>
       </tr>`;
   }).join('');
 }

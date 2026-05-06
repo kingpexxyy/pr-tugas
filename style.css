@@ -447,9 +447,59 @@ body.dark .deadline-banner .banner-text span{color:#fcd34d}
   #page-kalender > div { grid-template-columns: 1fr !important; }
   /* Stats layout for dashboard urgent section */
   #page-dashboard > div:nth-child(4) { grid-template-columns: 1fr !important; }
-  /* Table scroll */
-  .table-container { overflow-x: auto; }
-  table { min-width: 600px; }
+  /* Table → card list on mobile */
+  .table-container { overflow: visible; background: transparent; box-shadow: none; border: none; border-radius: 0; }
+  table, thead, tbody, th, td, tr { display: block; }
+  thead { display: none; }
+  tr {
+    background: var(--card);
+    border-radius: 14px;
+    margin-bottom: 10px;
+    padding: 14px 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    cursor: pointer;
+  }
+  tr:hover td { background: transparent; }
+  td {
+    padding: 3px 0;
+    border: none;
+    font-size: .85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  td::before {
+    content: attr(data-label);
+    font-size: .7rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    min-width: 80px;
+    flex-shrink: 0;
+  }
+  td:first-child { font-weight: 700; font-size: .9rem; }
+  td:first-child::before { display: none; }
+  td:first-child { margin-bottom: 6px; }
+  /* Export button full width on mobile */
+  .btn-export { width: 100%; margin-bottom: 12px; justify-content: center; }
+  /* Page header stack on mobile for pengumpulan */
+  #page-pengumpulan .page-header { flex-direction: column !important; gap: 10px; }
+  /* Filter bar compact */
+  .filter-bar select { width: 100%; }
+  /* Dashboard 2-col grids → 1 col */
+  #page-dashboard > div[style*="grid-template-columns:1fr 340px"],
+  #page-dashboard > div[style*="grid-template-columns:1fr 200px"] { display: flex !important; flex-direction: column !important; }
+  /* Statistik 2-col → 1 col */
+  #page-statistik > div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr !important; }
+  /* Streak card compact */
+  .streak-card { padding: 16px; }
+  .streak-card .streak-num { font-size: 2rem; }
+  /* Kelola tugas filter + button */
+  #page-tugas > div[style*="display:flex"] { flex-direction: column !important; }
+  #page-tugas > div[style*="display:flex"] .filter-bar { margin: 0 !important; }
+  #page-tugas > div[style*="display:flex"] .btn { width: 100%; }
   /* Toast bottom offset for nav */
   .toast { bottom: 76px; right: 16px; left: 16px; max-width: none; }
   /* Filter bar stack */
