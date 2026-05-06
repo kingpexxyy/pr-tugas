@@ -417,8 +417,43 @@ body.dark .deadline-banner .banner-text span{color:#fcd34d}
 }
 .mobile-fab:active { transform: scale(.92); }
 
+/* ===== DARK MODE SMOOTH TRANSITION ===== */
+body { transition: background-color .35s ease, color .25s ease; }
+.stat-card, .task-card, .modal, .auth-card, .profile-card, .sheets-config,
+.table-container, .mini-calendar, .filter-bar input, .filter-bar select,
+.form-group input, .form-group select, .form-group textarea,
+.search-results, .deadline-banner, .notif-banner {
+  transition: background-color .3s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+/* ===== EXTRA ANIMATIONS ===== */
+@keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+.stat-card { animation: slideUp .4s cubic-bezier(.4,0,.2,1) both; }
+.stat-card:nth-child(1) { animation-delay: .05s; }
+.stat-card:nth-child(2) { animation-delay: .1s; }
+.stat-card:nth-child(3) { animation-delay: .15s; }
+.stat-card:nth-child(4) { animation-delay: .2s; }
+
+.task-card { animation: slideUp .35s cubic-bezier(.4,0,.2,1) both; }
+.modal-overlay.open .modal { animation: slideUp .3s cubic-bezier(.34,1.56,.64,1); }
+
+/* Sidebar nav hover */
+.sidebar nav a { transition: background .2s, color .2s, transform .15s; }
+.sidebar nav a:hover { transform: translateX(3px); }
+.sidebar nav a.active { transform: translateX(3px); }
+
+/* Mobile nav tap */
+.mobile-nav-item { transition: color .2s, transform .15s; }
+.mobile-nav-item:active { transform: scale(.88); }
+.mobile-nav-item.active { transform: none; }
+
+/* FAB only on mobile */
+@media(min-width:769px) {
+  .mobile-fab { display: none !important; }
+}
+
 @media(max-width:768px) {
-  :root { --sidebar-w: 0px; }
   .sidebar { display: none !important; }
   .mobile-nav { display: block; }
   .mobile-topbar { display: flex; }
@@ -442,11 +477,14 @@ body.dark .deadline-banner .banner-text span{color:#fcd34d}
     border-radius: 20px 20px 0 0;
     max-height: 92vh;
     height: auto;
-    padding: 20px 18px 24px;
+    padding: 20px 18px 40px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
   .modal-wide { max-width: 100%; }
+  /* Ensure modal actions always visible */
+  .modal-actions { position: sticky; bottom: 0; background: var(--card); padding: 12px 0 0; margin-top: 16px; }
   /* Page header compact */
   .page-header h1 { font-size: 1.3rem; }
   /* Hide search bar in header on mobile (use topbar search) */
@@ -476,7 +514,10 @@ body.dark .deadline-banner .banner-text span{color:#fcd34d}
     display: flex;
     align-items: center;
     gap: 8px;
+    min-height: 28px;
   }
+  td > div[style*="flex:1"] { flex: 1; width: 100%; }
+  td > div { width: 100%; }
   td::before {
     content: attr(data-label);
     font-size: .7rem;
