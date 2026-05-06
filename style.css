@@ -528,9 +528,11 @@ body { transition: background-color .35s ease, color .25s ease; }
     min-width: 80px;
     flex-shrink: 0;
   }
-  td:first-child { font-weight: 700; font-size: .9rem; }
+  td:first-child { font-weight: 700; font-size: .9rem; word-break: break-word; }
   td:first-child::before { display: none; }
   td:first-child { margin-bottom: 6px; }
+  td:first-child strong { display: block; font-size: .9rem; margin-bottom: 2px; word-break: break-word; }
+  td:first-child span { font-size: .75rem; color: var(--text-muted); display: block; word-break: break-word; }
   /* Export button full width on mobile */
   .btn-export { width: 100%; margin-bottom: 12px; justify-content: center; }
   /* Page header stack on mobile for pengumpulan */

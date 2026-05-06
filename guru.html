@@ -41,7 +41,7 @@
 </nav>
 
 <!-- FAB: Tambah Tugas -->
-<button class="mobile-fab" id="mobileFab" onclick="openAddModal()" style="display:flex">➕</button>
+<button class="mobile-fab" id="mobileFab" onclick="openAddModal()">➕</button>
 
 <div class="dashboard">
   <aside class="sidebar">
@@ -313,7 +313,7 @@ function setMobileNav(page) {
   if (el) el.classList.add('active');
   // Show/hide FAB only on tugas page
   const fab = document.getElementById('mobileFab');
-  if (fab) fab.style.display = (page === 'tugas' || page === 'dashboard') ? 'flex' : 'none';
+  if (fab) fab.style.display = (window.innerWidth <= 768 && (page === 'tugas' || page === 'dashboard')) ? 'flex' : 'none';
   const mi = document.getElementById('darkIconMobile');
   if (mi) mi.textContent = localStorage.getItem('darkMode') === '1' ? '☀️' : '🌙';
 }
