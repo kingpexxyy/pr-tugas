@@ -64,7 +64,22 @@ function initFirebaseListeners() {
   });
   window._fbOnValue(window._fbRef(window._fbDB, 'submissions'), snap => {
     const data = snap.val() || {};
-    submissions = Object.values(data).sort((a,b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+    const newSubmissions = Object.values(data).sort((a,b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+
+    // Notif guru saat ada pengumpulan baru
+    if (submissions.length > 0 && newSubmissions.length > submissions.length) {
+      const latest = newSubmissions[0];
+      if (latest && Notification.permission === 'granted') {
+        try {
+          new Notification('📥 Tugas Baru Dikumpulkan!', {
+            body: `${latest.studentName} mengumpulkan "${latest.taskTitle}"`,
+            tag: 'submission_' + latest.id
+          });
+        } catch(e) {}
+      }
+    }
+
+    submissions = newSubmissions;
     localStorage.setItem('submissions', JSON.stringify(submissions));
     updateStats();
     // Always update recent tasks progress on dashboard
@@ -95,6 +110,13 @@ if (window._fbReady) {
 }
 
 startClock();
+
+// Request notif permission untuk guru
+if ('Notification' in window && Notification.permission === 'default') {
+  Notification.requestPermission().then(p => {
+    if (p === 'granted') showToast('🔔 Notifikasi aktif!', 'success');
+  });
+}
 
 // ===== DARK MODE =====
 function applyDark() {

@@ -163,38 +163,98 @@ function renderStreak() {
 
 // ===== NOTIFIKASI BROWSER =====
 function requestNotifPermission() {
-  const banner = document.getElementById('notifBanner');
-  if (!banner) return;
   if (!('Notification' in window)) return;
-  if (Notification.permission === 'granted') { checkDeadlineNotifs(); return; }
-  if (Notification.permission !== 'denied') {
-    banner.innerHTML = `
-      <div class="notif-banner">
-        🔔 Aktifkan notifikasi untuk dapat pengingat tenggat tugas otomatis
-        <button onclick="enableNotif()">Aktifkan</button>
-      </div>`;
+  const banner = document.getElementById('notifBanner');
+
+  if (Notification.permission === 'granted') {
+    if (banner) banner.innerHTML = '';
+    checkDeadlineNotifs();
+    return;
   }
+
+  if (Notification.permission === 'denied') {
+    if (banner) banner.innerHTML = '';
+    return;
+  }
+
+  // Auto-request langsung tanpa perlu klik banner
+  Notification.requestPermission().then(p => {
+    if (banner) banner.innerHTML = '';
+    if (p === 'granted') {
+      showToast('🔔 Notifikasi aktif!', 'success');
+      checkDeadlineNotifs();
+      scheduleNotifications();
+    }
+  });
 }
+
 function enableNotif() {
   Notification.requestPermission().then(p => {
     const banner = document.getElementById('notifBanner');
-    if (p === 'granted') { if (banner) banner.innerHTML = ''; showToast('🔔 Notifikasi aktif!', 'success'); checkDeadlineNotifs(); }
-    else { if (banner) banner.innerHTML = ''; }
-  });
-}
-function checkDeadlineNotifs() {
-  if (Notification.permission !== 'granted') return;
-  const now = new Date(), in1h = new Date(now.getTime() + 3600000);
-  const submittedIds = mySubmissions.map(s => s.taskId);
-  const notified = JSON.parse(localStorage.getItem('notified_' + currentUser.username) || '[]');
-  tasks.forEach(t => {
-    const d = new Date(t.deadline);
-    if (!submittedIds.includes(t.id) && d >= now && d <= in1h && !notified.includes(t.id)) {
-      new Notification('⏰ Tenggat Tugas Hampir Tiba!', { body: `${t.title} · ${t.subject} — tenggat dalam 1 jam!`, icon: '📚' });
-      notified.push(t.id);
-      localStorage.setItem('notified_' + currentUser.username, JSON.stringify(notified));
+    if (banner) banner.innerHTML = '';
+    if (p === 'granted') {
+      showToast('🔔 Notifikasi aktif!', 'success');
+      checkDeadlineNotifs();
+      scheduleNotifications();
     }
   });
+}
+
+function sendNotif(title, body, tag) {
+  if (Notification.permission !== 'granted') return;
+  try {
+    new Notification(title, {
+      body,
+      icon: 'https://pr-tugas-l98j.vercel.app/favicon.ico',
+      badge: 'https://pr-tugas-l98j.vercel.app/favicon.ico',
+      tag: tag || 'tugasku',
+      renotify: true,
+      vibrate: [200, 100, 200]
+    });
+  } catch(e) {
+    // Fallback tanpa options yang tidak didukung
+    new Notification(title, { body });
+  }
+}
+
+function checkDeadlineNotifs() {
+  if (Notification.permission !== 'granted') return;
+  const now = new Date();
+  const submittedIds = mySubmissions.map(s => s.taskId);
+  const notified = JSON.parse(localStorage.getItem('notified_' + currentUser.username) || '{}');
+
+  tasks.forEach(t => {
+    if (submittedIds.includes(t.id)) return;
+    const d = new Date(t.deadline);
+    if (d < now) return; // sudah lewat
+
+    const diffMs = d - now;
+    const diffH = diffMs / 3600000;
+
+    // Notif 24 jam sebelum
+    if (diffH <= 24 && diffH > 23 && !notified[t.id + '_24h']) {
+      sendNotif('📅 Tenggat Besok!', `${t.title} · ${t.subject} — tenggat besok!`, t.id + '_24h');
+      notified[t.id + '_24h'] = true;
+    }
+    // Notif 3 jam sebelum
+    if (diffH <= 3 && diffH > 2.5 && !notified[t.id + '_3h']) {
+      sendNotif('⚠️ Tenggat 3 Jam Lagi!', `${t.title} · ${t.subject} — segera kumpulkan!`, t.id + '_3h');
+      notified[t.id + '_3h'] = true;
+    }
+    // Notif 1 jam sebelum
+    if (diffH <= 1 && diffH > 0.8 && !notified[t.id + '_1h']) {
+      sendNotif('🚨 Tenggat 1 Jam Lagi!', `${t.title} · ${t.subject} — jangan sampai terlambat!`, t.id + '_1h');
+      notified[t.id + '_1h'] = true;
+    }
+  });
+
+  localStorage.setItem('notified_' + currentUser.username, JSON.stringify(notified));
+}
+
+// Jadwalkan pengecekan notif setiap 5 menit
+function scheduleNotifications() {
+  checkDeadlineNotifs();
+  setInterval(checkDeadlineNotifs, 5 * 60 * 1000);
 }
 
 // ===== COUNTDOWN TIMERS =====

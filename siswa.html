@@ -329,5 +329,11 @@ function setMobileNav(page) {
 })();
 </script>
 <script src="siswa.js"></script>
+<script>
+// Register Service Worker for background notifications
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
 </body>
 </html>
