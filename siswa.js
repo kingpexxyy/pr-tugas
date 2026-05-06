@@ -269,7 +269,7 @@ function taskCardHTML(task, isSubmitted) {
         <div style="display:flex;gap:6px;align-items:center">
           ${countdown}
           ${est}
-          ${!isSubmitted ? `<button class="btn ${isOverdue ? 'btn-danger' : 'btn-primary'} btn-sm" onclick="event.stopPropagation();openSubmitModal('${task.id}')">📤 Kumpulkan</button>` : '<span class="badge badge-submitted">✅ Terkumpul</span>'}
+          ${!isSubmitted ? `<button class="btn ${isOverdue ? 'btn-danger' : 'btn-primary'} btn-sm" onclick="event.stopPropagation();openSubmitModal('${task.id}')">📤 Kumpulkan</button>` : ''}
         </div>
       </div>
     </div>`;
