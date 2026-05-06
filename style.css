@@ -329,7 +329,11 @@ body.dark tr:hover td{background:#0f172a}
 body.dark .global-search-bar input{background:#0f172a}
 body.dark .deadline-banner{background:linear-gradient(135deg,#451a03,#78350f);border-color:#92400e}
 body.dark .deadline-banner .banner-text strong{color:#fbbf24}
-body.dark .deadline-banner .banner-text span{color:#fcd34d}
+/* Dark mode — fix hardcoded purple badge in personal task detail */
+body.dark .task-detail-icon[style*="ede9fe"] { background: #2e1065 !important; }
+body.dark span[style*="color:#7c3aed"] { color: #c4b5fd !important; }
+body.dark span[style*="background:#ede9fe"] { background: #2e1065 !important; color: #c4b5fd !important; }
+body.dark div[style*="background:#ede9fe"] { background: #2e1065 !important; }
 
 /* ===== MOBILE BOTTOM NAV ===== */
 .mobile-nav {

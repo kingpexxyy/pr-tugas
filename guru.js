@@ -48,6 +48,10 @@ checkSheetsStatus();
 
 // Firebase realtime listeners — data sync otomatis ke semua device
 function initFirebaseListeners() {
+  // Loading state on first open
+  const grid = document.getElementById('recentTasksGrid');
+  if (grid && !tasks.length) grid.innerHTML = '<div class="empty-state"><div class="icon" style="font-size:2rem">⏳</div><p>Memuat data...</p></div>';
+
   window._fbOnValue(window._fbRef(window._fbDB, 'tasks'), snap => {
     const data = snap.val() || {};
     tasks = Object.values(data).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -60,13 +64,17 @@ function initFirebaseListeners() {
     submissions = Object.values(data).sort((a,b) => new Date(b.submittedAt) - new Date(a.submittedAt));
     localStorage.setItem('submissions', JSON.stringify(submissions));
     updateStats();
-    if (document.getElementById('page-pengumpulan').style.display !== 'none') renderSubmissions();
+    // Always update recent tasks progress on dashboard
+    renderRecentTasks();
+    if (document.getElementById('page-pengumpulan').style.display !== 'none') { populateSubmissionFilter(); renderSubmissions(); }
     if (document.getElementById('page-statistik').style.display !== 'none') renderStatistik();
+    if (document.getElementById('page-tugas').style.display !== 'none') renderTaskTable();
   });
   window._fbOnValue(window._fbRef(window._fbDB, 'feedbacks'), snap => {
     const data = snap.val() || {};
     feedbacks = Object.values(data);
     localStorage.setItem('feedbacks', JSON.stringify(feedbacks));
+    if (document.getElementById('page-pengumpulan').style.display !== 'none') renderSubmissions();
   });
   window._fbOnValue(window._fbRef(window._fbDB, 'activityLog'), snap => {
     const data = snap.val() || {};

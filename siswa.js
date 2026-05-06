@@ -29,6 +29,10 @@ document.getElementById('profileClass').value = currentUser.class || '';
 applyDark();
 
 function initFirebaseListeners() {
+  // Show loading indicator
+  const grid = document.getElementById('urgentTasksGrid');
+  if (grid && !tasks.length) grid.innerHTML = '<div class="empty-state"><div class="icon" style="font-size:2rem">⏳</div><p>Memuat tugas...</p></div>';
+
   window._fbOnValue(window._fbRef(window._fbDB, 'tasks'), snap => {
     const data = snap.val() || {};
     tasks = Object.values(data).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -36,6 +40,7 @@ function initFirebaseListeners() {
     updateStats(); renderUrgentTasks(); renderStreak(); populateFilters();
     if (document.getElementById('page-tugas').style.display !== 'none') renderTasks();
     if (document.getElementById('page-kalender').style.display !== 'none') renderCalendar();
+    if (document.getElementById('page-jadwalku').style.display !== 'none') renderPersonalTasks();
   });
   window._fbOnValue(window._fbRef(window._fbDB, 'submissions'), snap => {
     const data = snap.val() || {};
@@ -49,6 +54,11 @@ function initFirebaseListeners() {
   window._fbOnValue(window._fbRef(window._fbDB, 'feedbacks'), snap => {
     const data = snap.val() || {};
     localStorage.setItem('feedbacks', JSON.stringify(Object.values(data)));
+    // Re-render task detail if open to show latest feedback
+    if (document.getElementById('taskDetailModal').classList.contains('open')) {
+      const feedbacks = Object.values(data);
+      localStorage.setItem('feedbacks', JSON.stringify(feedbacks));
+    }
   });
 }
 
