@@ -583,3 +583,143 @@ body { transition: background-color .35s ease, color .25s ease; }
 
 body.dark .mobile-nav { background: linear-gradient(180deg,#020617,#0f172a); }
 body.dark .mobile-topbar { background: linear-gradient(135deg,#020617,#1e1b4b); }
+
+/* ===== UI UPGRADES ===== */
+
+/* Better card design */
+.task-card {
+  border-top-width: 3px;
+  border-radius: 18px;
+}
+.task-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,.12); }
+
+/* Glassmorphism sidebar */
+.sidebar {
+  background: linear-gradient(180deg,#1a1040 0%,#2d1b69 60%,#3b0764 100%);
+  border-right: 1px solid rgba(255,255,255,.06);
+}
+body.dark .sidebar { background: linear-gradient(180deg,#020617 0%,#0c0a1e 100%); }
+
+/* Better stat cards */
+.stat-card {
+  border-radius: 20px;
+  border: none;
+  background: var(--card);
+}
+.stat-card:nth-child(1) { background: linear-gradient(135deg,#eef2ff,#e0e7ff); }
+.stat-card:nth-child(2) { background: linear-gradient(135deg,#ecfdf5,#d1fae5); }
+.stat-card:nth-child(3) { background: linear-gradient(135deg,#fffbeb,#fef3c7); }
+.stat-card:nth-child(4) { background: linear-gradient(135deg,#fef2f2,#fee2e2); }
+body.dark .stat-card:nth-child(1) { background: linear-gradient(135deg,#1e1b4b,#312e81); }
+body.dark .stat-card:nth-child(2) { background: linear-gradient(135deg,#022c22,#064e3b); }
+body.dark .stat-card:nth-child(3) { background: linear-gradient(135deg,#1c1003,#451a03); }
+body.dark .stat-card:nth-child(4) { background: linear-gradient(135deg,#1c0202,#450a0a); }
+
+/* Better auth card */
+.auth-card { border-radius: 28px; }
+
+/* Better modal */
+.modal { border-radius: 24px; }
+@media(max-width:768px) {
+  .modal { border-radius: 24px 24px 0 0; }
+}
+
+/* Better buttons */
+.btn-primary {
+  background: linear-gradient(135deg,#6366f1,#4f46e5);
+  letter-spacing: .3px;
+}
+.btn-primary:hover { background: linear-gradient(135deg,#4f46e5,#4338ca); }
+
+/* Better form inputs */
+.form-group input, .form-group select, .form-group textarea {
+  border-radius: 14px;
+  font-size: .92rem;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99,102,241,.15);
+}
+
+/* Better badges */
+.badge { border-radius: 8px; font-size: .72rem; letter-spacing: .3px; }
+.badge-pending { background: #fef3c7; color: #92400e; }
+.badge-submitted { background: #d1fae5; color: #065f46; }
+.badge-overdue { background: #fee2e2; color: #991b1b; }
+.badge-graded { background: #eef2ff; color: #3730a3; }
+body.dark .badge-pending { background: #451a03; color: #fcd34d; }
+body.dark .badge-submitted { background: #064e3b; color: #6ee7b7; }
+body.dark .badge-overdue { background: #7f1d1d; color: #fca5a5; }
+body.dark .badge-graded { background: #1e1b4b; color: #a5b4fc; }
+
+/* Better deadline chips */
+.task-card .deadline-chip { border-radius: 8px; font-size: .75rem; }
+body.dark .task-card .deadline-chip.urgent { background: #7f1d1d; color: #fca5a5; }
+body.dark .task-card .deadline-chip.warning { background: #451a03; color: #fcd34d; }
+body.dark .task-card .deadline-chip.ok { background: #064e3b; color: #6ee7b7; }
+body.dark .est-chip { background: #451a03; color: #fcd34d; }
+
+/* Better progress bar */
+.progress-bar { height: 8px; border-radius: 99px; }
+.progress-fill { border-radius: 99px; }
+
+/* Better table */
+.table-container { border-radius: 20px; }
+th { font-size: .72rem; letter-spacing: .6px; }
+
+/* Better mobile topbar */
+.mobile-topbar {
+  background: linear-gradient(135deg,#1a1040,#3b0764);
+  height: 58px;
+}
+body.dark .mobile-topbar { background: linear-gradient(135deg,#020617,#0c0a1e); }
+
+/* Better mobile nav */
+.mobile-nav {
+  background: linear-gradient(180deg,#1a1040,#2d1b69);
+}
+body.dark .mobile-nav { background: linear-gradient(180deg,#020617,#0c0a1e); }
+
+/* Smooth page transitions */
+.page { animation: fadeSlideIn .3s cubic-bezier(.4,0,.2,1); }
+
+/* Better empty state */
+.empty-state { padding: 48px 20px; }
+.empty-state .icon { font-size: 3rem; opacity: .5; }
+
+/* Better streak card */
+.streak-card { border-radius: 20px; }
+
+/* Better calendar */
+.mini-calendar { border-radius: 20px; }
+.mini-calendar .cal-day.today { border-radius: 10px; }
+
+/* Better sheets config */
+.sheets-config { border-radius: 20px; }
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Better focus ring */
+*:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* Notification banner */
+.notif-banner { border-radius: 16px; }
+
+/* Better deadline banner */
+.deadline-banner { border-radius: 16px; }
+
+/* Better profile card */
+.profile-card { border-radius: 20px; }
+
+/* Better filter bar inputs */
+.filter-bar input, .filter-bar select { border-radius: 12px; }
+
+/* Improved dark mode for cards with inline bg */
+body.dark div[style*="background:var(--card)"] { background: var(--card) !important; }
+body.dark div[style*="background:#ede9fe"] { background: #2e1065 !important; }
+body.dark span[style*="background:#ede9fe"] { background: #2e1065 !important; color: #c4b5fd !important; }
+body.dark span[style*="color:#7c3aed"] { color: #c4b5fd !important; }

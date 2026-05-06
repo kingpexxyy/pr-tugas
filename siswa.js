@@ -8,10 +8,12 @@ function fbSaveSubmission(sub) {
 }
 
 // ===== STATE =====
-let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-let submissions = JSON.parse(localStorage.getItem('submissions') || '[]');
+// PENTING: Jangan baca dari localStorage untuk tasks/submissions
+// Firebase adalah sumber kebenaran. localStorage hanya cache offline.
+let tasks = [];
+let submissions = [];
 let personalTasks = JSON.parse(localStorage.getItem('personalTasks_' + currentUser.username) || '[]');
-let mySubmissions = submissions.filter(s => s.studentUsername === currentUser.username);
+let mySubmissions = [];
 let pinnedTasks = JSON.parse(localStorage.getItem('pinnedTasks_' + currentUser.username) || '[]');
 
 const SUBJ_COLORS = {

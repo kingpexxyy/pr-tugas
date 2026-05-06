@@ -27,10 +27,13 @@ function fbAddActivity(entry) {
 }
 
 // ===== STATE =====
-let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-let submissions = JSON.parse(localStorage.getItem('submissions') || '[]');
-let feedbacks = JSON.parse(localStorage.getItem('feedbacks') || '[]');
-let activityLog = JSON.parse(localStorage.getItem('activityLog') || '[]');
+// PENTING: Jangan baca dari localStorage untuk tasks/submissions
+// karena Firebase adalah sumber kebenaran. localStorage hanya cache.
+// Membaca dari localStorage bisa menyebabkan data stale antar device.
+let tasks = [];
+let submissions = [];
+let feedbacks = [];
+let activityLog = [];
 let currentFeedbackSub = null;
 
 const SUBJ_COLORS = {
