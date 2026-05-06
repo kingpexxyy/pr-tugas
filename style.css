@@ -327,10 +327,14 @@ body.dark .deadline-banner .banner-text span{color:#fcd34d}
   position: fixed;
   bottom: 0; left: 0; right: 0;
   background: linear-gradient(180deg,#1e1b4b,#312e81);
-  z-index: 200;
+  z-index: 9999;
   padding: 0 4px;
-  padding-bottom: max(env(safe-area-inset-bottom, 12px), 12px);
-  box-shadow: 0 -4px 20px rgba(0,0,0,.2);
+  padding-bottom: max(env(safe-area-inset-bottom, 16px), 16px);
+  box-shadow: 0 -4px 20px rgba(0,0,0,.3);
+  /* Force GPU layer to prevent scroll-away bug */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform;
 }
 .mobile-nav-inner {
   display: flex;

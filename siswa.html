@@ -260,12 +260,30 @@ function setMobileNav(page) {
   document.querySelectorAll('.mobile-nav-item').forEach(b => b.classList.remove('active'));
   const el = document.getElementById('mn-' + page);
   if (el) el.classList.add('active');
-  // sync dark icon
   const mi = document.getElementById('darkIconMobile');
   if (mi) mi.textContent = localStorage.getItem('darkMode') === '1' ? '☀️' : '🌙';
 }
-// Override toggleDark to also update mobile icon
-const _origToggleDark = window.toggleDark;
+
+// Fix: lock bottom nav position when browser chrome hides/shows
+(function() {
+  const nav = document.querySelector('.mobile-nav');
+  if (!nav || window.innerWidth > 768) return;
+  function lockNav() {
+    nav.style.position = 'fixed';
+    nav.style.bottom = '0px';
+    nav.style.top = 'auto';
+  }
+  lockNav();
+  window.addEventListener('resize', lockNav);
+  window.addEventListener('scroll', lockNav, { passive: true });
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', function() {
+      nav.style.top = (window.visualViewport.offsetTop + window.visualViewport.height - nav.offsetHeight) + 'px';
+      nav.style.bottom = 'auto';
+      nav.style.position = 'fixed';
+    });
+  }
+})();
 </script>
 <script src="siswa.js"></script>
 </body>
