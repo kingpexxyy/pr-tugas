@@ -202,32 +202,20 @@
 
     <!-- PENGATURAN -->
     <div id="page-pengaturan" class="page" style="display:none">
-      <div class="page-header"><h1>Pengaturan</h1><p>Konfigurasi integrasi Google Sheets</p></div>
-
-      <!-- SYNC DATA -->
-      <div class="sheets-config" style="margin-bottom:16px">
-        <h3>📦 Sync Data Antar Device</h3>
-        <p>Export data tugas & pengumpulan, lalu import di HP atau device lain agar data tetap sama.</p>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
-          <button class="btn btn-primary btn-sm" onclick="exportData()">⬇️ Export Data (.json)</button>
-          <label class="btn btn-secondary btn-sm" style="cursor:pointer">
-            ⬆️ Import Data
-            <input type="file" accept=".json" style="display:none" onchange="importData(this)">
-          </label>
-        </div>
-        <p style="font-size:.75rem;color:var(--text-muted);margin-top:10px">💡 Cara pakai: Export di laptop → kirim file ke HP → Import di HP</p>
-      </div>
+      <div class="page-header"><h1>Pengaturan</h1><p>Integrasi Google Sheets</p></div>
 
       <div class="sheets-config">
-        <h3>🔗 Integrasi Google Sheets</h3>
-        <p>Tugas baru otomatis masuk ke sheet "Tugas". Status pengumpulan siswa tercatat di sheet "Status".</p>
-        <div class="form-group"><label>URL Google Apps Script Web App</label><input type="url" id="sheetsUrl" placeholder="https://script.google.com/macros/s/..."></div>
-        <div class="form-group"><label>URL Google Spreadsheet (untuk tombol buka)</label><input type="url" id="spreadsheetUrl" placeholder="https://docs.google.com/spreadsheets/d/..."></div>
-        <button class="btn btn-primary btn-sm" onclick="saveSheetUrl()">Simpan & Test Koneksi</button>
-        <div class="sheets-status" id="sheetsStatus">
-          <div class="status-dot" id="statusDot"></div>
-          <span id="statusText">Belum terhubung</span>
+        <h3>📊 Google Sheets — Terhubung Otomatis</h3>
+        <p>Data tugas dan pengumpulan siswa otomatis tersinkron ke spreadsheet. Setiap siswa memiliki tab tersendiri.</p>
+        <div class="sheets-status" style="margin-top:16px;margin-bottom:16px">
+          <div class="status-dot connected"></div>
+          <span style="font-weight:700;color:var(--success)">Terhubung</span>
         </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-primary btn-sm" onclick="SheetsAPI.openSpreadsheet()">📊 Buka Spreadsheet</button>
+          <button class="btn btn-secondary btn-sm" onclick="testSheetsConnection()">🔄 Test Koneksi</button>
+        </div>
+        <div id="sheetsTestResult" style="margin-top:12px;font-size:.82rem"></div>
       </div>
     </div>
 

@@ -1,31 +1,21 @@
 /**
- * Google Sheets Integration
- *
- * 2 Sheet:
- * 1. "Tugas"  → otomatis terisi saat guru tambah tugas
- *    Header: id | title | subject | description | deadline | createdBy | createdAt
- *
- * 2. "Status" → status pengumpulan per siswa per tugas
- *    Header: taskId | taskTitle | subject | deadline | studentName | studentClass | status | submittedAt | note
- *
- * Setup:
- * 1. Buat Google Sheet, buat 2 tab: "Tugas" dan "Status"
- * 2. Isi header masing-masing sesuai di atas
- * 3. Buka Ekstensi → Apps Script → paste kode di bawah → Deploy Web App (Anyone)
- * 4. Paste URL Web App + URL Spreadsheet di halaman Pengaturan guru
+ * Google Sheets Integration — Auto-connected
+ * Web App URL dan Spreadsheet URL sudah di-hardcode.
+ * Sheet otomatis dibuat per siswa saat pertama kali kumpul tugas.
  */
 
+const SHEETS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwWCz-5Shp843L2S3JMuBQoG8d0BqwgLXFyEor3fU10OfmptbRyX9H0dTXJguRX9N4_Vw/exec';
+const SHEETS_SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/1ouPIpyzGLQgyXM9zlDjLe6MWZjE7mBeav7n2ZpDyuEY/edit';
+
 const SheetsAPI = {
-  getWebAppUrl() { return localStorage.getItem('sheetsWebAppUrl') || ''; },
-  setWebAppUrl(url) { localStorage.setItem('sheetsWebAppUrl', url); },
-  getSpreadsheetUrl() { return localStorage.getItem('sheetsSpreadsheetUrl') || ''; },
-  setSpreadsheetUrl(url) { localStorage.setItem('sheetsSpreadsheetUrl', url); },
-  isConnected() { return !!this.getWebAppUrl(); },
+  getWebAppUrl() { return SHEETS_WEB_APP_URL; },
+  setWebAppUrl(url) { /* hardcoded, no-op */ },
+  getSpreadsheetUrl() { return SHEETS_SPREADSHEET_URL; },
+  setSpreadsheetUrl(url) { /* hardcoded, no-op */ },
+  isConnected() { return true; }, // always connected
 
   openSpreadsheet() {
-    const url = this.getSpreadsheetUrl();
-    if (url) window.open(url, '_blank');
-    else alert('URL Spreadsheet belum diatur. Masukkan di halaman Pengaturan.');
+    window.open(SHEETS_SPREADSHEET_URL, '_blank');
   },
 
   // Guru tambah tugas → masuk sheet "Tugas"
@@ -103,26 +93,11 @@ const SheetsAPI = {
 
   // Generate a shareable config link that encodes the Sheets URLs
   getShareLink() {
-    const webUrl = this.getWebAppUrl();
-    const spreadUrl = this.getSpreadsheetUrl();
-    if (!webUrl) return null;
-    const config = btoa(JSON.stringify({ w: webUrl, s: spreadUrl }));
-    return window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + 'siswa.html#cfg=' + config;
+    return null; // hardcoded, no need to share
   },
 
-  // Load config from URL hash if present (call on page load)
-  loadFromHash() {
-    const hash = window.location.hash;
-    if (!hash.startsWith('#cfg=')) return false;
-    try {
-      const config = JSON.parse(atob(hash.slice(5)));
-      if (config.w) { this.setWebAppUrl(config.w); }
-      if (config.s) { this.setSpreadsheetUrl(config.s); }
-      // Clean hash from URL without reload
-      history.replaceState(null, '', window.location.pathname);
-      return true;
-    } catch(e) { return false; }
-  },
+  // Load config from URL hash if present (no-op, hardcoded)
+  loadFromHash() { return false; },
 
   // JSONP helper — bypass CORS untuk Apps Script dari file lokal
   _fetchJsonp(url) {

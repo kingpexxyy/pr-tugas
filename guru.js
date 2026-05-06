@@ -550,57 +550,18 @@ function globalSearchHandler() {
 function closeSearch() { const r = document.getElementById('searchResults'); if (r) r.classList.remove('open'); }
 
 // ===== SHEETS =====
-function checkSheetsStatus() {
-  const url = SheetsAPI.getWebAppUrl();
-  const dot = document.getElementById('statusDot'), text = document.getElementById('statusText');
-  if (!dot) return;
-  if (url) {
-    dot.className = 'status-dot connected';
-    text.textContent = 'Terhubung';
-    document.getElementById('sheetsUrl').value = url;
-  } else {
-    dot.className = 'status-dot';
-    text.textContent = 'Belum terhubung';
-  }
-  const spreadUrl = SheetsAPI.getSpreadsheetUrl();
-  if (spreadUrl && document.getElementById('spreadsheetUrl')) document.getElementById('spreadsheetUrl').value = spreadUrl;
+function checkSheetsStatus() { /* auto-connected, no-op */ }
 
-  // Show share link for students
-  const shareLink = SheetsAPI.getShareLink();
-  let shareLinkEl = document.getElementById('sheetsShareLink');
-  if (!shareLinkEl) {
-    const container = document.getElementById('sheetsStatus').parentElement;
-    const div = document.createElement('div');
-    div.id = 'sheetsShareLink';
-    div.style.cssText = 'margin-top:14px;padding:12px 14px;background:var(--primary-light);border-radius:12px;font-size:.82rem;';
-    container.appendChild(div);
-    shareLinkEl = div;
-  }
-  if (shareLink) {
-    shareLinkEl.innerHTML = `
-      <div style="font-weight:700;color:var(--primary);margin-bottom:6px">🔗 Link untuk Siswa</div>
-      <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:8px">Bagikan link ini ke siswa agar config Sheets otomatis tersimpan di HP mereka</div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <input type="text" value="${shareLink}" readonly style="flex:1;min-width:0;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:.75rem;background:var(--card);color:var(--text);outline:none">
-        <button onclick="navigator.clipboard.writeText('${shareLink}').then(()=>showToast('🔗 Link disalin!','success'))" style="padding:8px 14px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit">Salin</button>
-      </div>`;
-    shareLinkEl.style.display = 'block';
-  } else {
-    shareLinkEl.style.display = 'none';
-  }
-}
-async function saveSheetUrl() {
-  const url = document.getElementById('sheetsUrl').value.trim();
-  const spreadUrl = document.getElementById('spreadsheetUrl').value.trim();
-  if (!url) { showToast('Masukkan URL Web App terlebih dahulu', 'error'); return; }
-  SheetsAPI.setWebAppUrl(url);
-  if (spreadUrl) SheetsAPI.setSpreadsheetUrl(spreadUrl);
-  document.getElementById('statusDot').className = 'status-dot loading';
-  document.getElementById('statusText').textContent = 'Menguji koneksi…';
+async function testSheetsConnection() {
+  const el = document.getElementById('sheetsTestResult');
+  if (el) el.innerHTML = '<span style="color:var(--text-muted)">🔄 Menguji koneksi…</span>';
   const ok = await SheetsAPI.ping();
-  if (ok) { showToast('✅ Berhasil terhubung!', 'success'); checkSheetsStatus(); }
-  else { showToast('❌ Gagal terhubung.', 'error'); document.getElementById('statusDot').className = 'status-dot error'; document.getElementById('statusText').textContent = 'Koneksi gagal'; }
+  if (el) el.innerHTML = ok
+    ? '<span style="color:var(--success);font-weight:700">✅ Koneksi berhasil! Spreadsheet siap digunakan.</span>'
+    : '<span style="color:var(--danger);font-weight:700">❌ Gagal terhubung. Pastikan Apps Script sudah di-deploy.</span>';
 }
+
+async function saveSheetUrl() { /* no-op, hardcoded */ }
 
 // ===== EXPORT / IMPORT DATA (sync antar device) =====
 function exportData() {
