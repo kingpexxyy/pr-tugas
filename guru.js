@@ -34,15 +34,19 @@ checkSheetsStatus();
 function applyDark() {
   const dark = localStorage.getItem('darkMode') === '1';
   document.body.classList.toggle('dark', dark);
-  const sw = document.getElementById('darkSwitch');
   const ic = document.getElementById('darkIcon');
   if (ic) ic.textContent = dark ? '☀️' : '🌙';
+  const icm = document.getElementById('darkIconMobile');
+  if (icm) icm.textContent = dark ? '☀️' : '🌙';
 }
 function toggleDark() {
   const isDark = document.body.classList.toggle('dark');
   localStorage.setItem('darkMode', isDark ? '1' : '0');
   const ic = document.getElementById('darkIcon');
   if (ic) ic.textContent = isDark ? '☀️' : '🌙';
+  // Update mobile topbar icon too
+  const icm = document.getElementById('darkIconMobile');
+  if (icm) icm.textContent = isDark ? '☀️' : '🌙';
 }
 
 // ===== NAVIGATION =====
@@ -556,6 +560,66 @@ async function saveSheetUrl() {
   const ok = await SheetsAPI.ping();
   if (ok) { showToast('✅ Berhasil terhubung!', 'success'); checkSheetsStatus(); }
   else { showToast('❌ Gagal terhubung.', 'error'); document.getElementById('statusDot').className = 'status-dot error'; document.getElementById('statusText').textContent = 'Koneksi gagal'; }
+}
+
+// ===== EXPORT / IMPORT DATA (sync antar device) =====
+function exportData() {
+  const data = {
+    v: 1,
+    tasks: JSON.parse(localStorage.getItem('tasks') || '[]'),
+    submissions: JSON.parse(localStorage.getItem('submissions') || '[]'),
+    feedbacks: JSON.parse(localStorage.getItem('feedbacks') || '[]'),
+    sheetsWebAppUrl: localStorage.getItem('sheetsWebAppUrl') || '',
+    sheetsSpreadsheetUrl: localStorage.getItem('sheetsSpreadsheetUrl') || '',
+    exportedAt: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `tugasku-data-${new Date().toLocaleDateString('id-ID').replace(/\//g,'-')}.json`;
+  a.click();
+  showToast('📦 Data berhasil diexport!', 'success');
+}
+
+function importData(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.v || !data.tasks) { showToast('❌ File tidak valid', 'error'); return; }
+      if (!confirm(`Import data dari ${new Date(data.exportedAt).toLocaleString('id-ID')}?\n${data.tasks.length} tugas, ${data.submissions.length} pengumpulan.\n\nData yang ada akan digabung.`)) return;
+      // Merge — tidak overwrite, gabungkan
+      const existingTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+      const existingIds = new Set(existingTasks.map(t => t.id));
+      const newTasks = [...existingTasks, ...data.tasks.filter(t => !existingIds.has(t.id))];
+      localStorage.setItem('tasks', JSON.stringify(newTasks));
+
+      const existingSubs = JSON.parse(localStorage.getItem('submissions') || '[]');
+      const existingSubIds = new Set(existingSubs.map(s => s.id));
+      const newSubs = [...existingSubs, ...data.submissions.filter(s => !existingSubIds.has(s.id))];
+      localStorage.setItem('submissions', JSON.stringify(newSubs));
+
+      const existingFbs = JSON.parse(localStorage.getItem('feedbacks') || '[]');
+      const existingFbIds = new Set(existingFbs.map(f => f.subId));
+      const newFbs = [...existingFbs, ...data.feedbacks.filter(f => !existingFbIds.has(f.subId))];
+      localStorage.setItem('feedbacks', JSON.stringify(newFbs));
+
+      if (data.sheetsWebAppUrl) localStorage.setItem('sheetsWebAppUrl', data.sheetsWebAppUrl);
+      if (data.sheetsSpreadsheetUrl) localStorage.setItem('sheetsSpreadsheetUrl', data.sheetsSpreadsheetUrl);
+
+      tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+      submissions = JSON.parse(localStorage.getItem('submissions') || '[]');
+      feedbacks = JSON.parse(localStorage.getItem('feedbacks') || '[]');
+      updateStats(); renderRecentTasks(); populateFilters(); checkSheetsStatus();
+      showToast('✅ Data berhasil diimport!', 'success');
+    } catch(err) {
+      showToast('❌ Gagal membaca file', 'error');
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
 }
 
 // ===== HELPERS =====

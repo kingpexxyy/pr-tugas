@@ -203,6 +203,21 @@
     <!-- PENGATURAN -->
     <div id="page-pengaturan" class="page" style="display:none">
       <div class="page-header"><h1>Pengaturan</h1><p>Konfigurasi integrasi Google Sheets</p></div>
+
+      <!-- SYNC DATA -->
+      <div class="sheets-config" style="margin-bottom:16px">
+        <h3>📦 Sync Data Antar Device</h3>
+        <p>Export data tugas & pengumpulan, lalu import di HP atau device lain agar data tetap sama.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+          <button class="btn btn-primary btn-sm" onclick="exportData()">⬇️ Export Data (.json)</button>
+          <label class="btn btn-secondary btn-sm" style="cursor:pointer">
+            ⬆️ Import Data
+            <input type="file" accept=".json" style="display:none" onchange="importData(this)">
+          </label>
+        </div>
+        <p style="font-size:.75rem;color:var(--text-muted);margin-top:10px">💡 Cara pakai: Export di laptop → kirim file ke HP → Import di HP</p>
+      </div>
+
       <div class="sheets-config">
         <h3>🔗 Integrasi Google Sheets</h3>
         <p>Tugas baru otomatis masuk ke sheet "Tugas". Status pengumpulan siswa tercatat di sheet "Status".</p>

@@ -39,12 +39,17 @@ function applyDark() {
   document.body.classList.toggle('dark', dark);
   const ic = document.getElementById('darkIcon');
   if (ic) ic.textContent = dark ? '☀️' : '🌙';
+  const icm = document.getElementById('darkIconMobile');
+  if (icm) icm.textContent = dark ? '☀️' : '🌙';
 }
 function toggleDark() {
   const isDark = document.body.classList.toggle('dark');
   localStorage.setItem('darkMode', isDark ? '1' : '0');
   const ic = document.getElementById('darkIcon');
   if (ic) ic.textContent = isDark ? '☀️' : '🌙';
+  // Update mobile topbar icon too
+  const icm = document.getElementById('darkIconMobile');
+  if (icm) icm.textContent = isDark ? '☀️' : '🌙';
 }
 
 // ===== AUTO REFRESH =====
@@ -601,6 +606,31 @@ function saveProfile() {
   document.getElementById('profilePass').value = '';
   document.getElementById('profilePassConfirm').value = '';
   showToast('✅ Profil berhasil disimpan!', 'success');
+}
+
+// ===== IMPORT DATA (siswa bisa import data tugas dari guru) =====
+function importDataSiswa(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.v || !data.tasks) { showToast('❌ File tidak valid', 'error'); return; }
+      if (!confirm(`Import ${data.tasks.length} tugas dari guru?\nData tugasmu yang ada akan digabung.`)) return;
+      const existingTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+      const existingIds = new Set(existingTasks.map(t => t.id));
+      const newTasks = [...existingTasks, ...data.tasks.filter(t => !existingIds.has(t.id))];
+      localStorage.setItem('tasks', JSON.stringify(newTasks));
+      if (data.sheetsWebAppUrl) localStorage.setItem('sheetsWebAppUrl', data.sheetsWebAppUrl);
+      if (data.sheetsSpreadsheetUrl) localStorage.setItem('sheetsSpreadsheetUrl', data.sheetsSpreadsheetUrl);
+      tasks = newTasks;
+      updateStats(); renderUrgentTasks(); populateFilters();
+      showToast('✅ Data tugas berhasil diimport!', 'success');
+    } catch(err) { showToast('❌ Gagal membaca file', 'error'); }
+  };
+  reader.readAsText(file);
+  input.value = '';
 }
 
 // ===== HELPERS =====

@@ -182,6 +182,14 @@
         <div class="form-group"><label>Password Baru</label><input type="password" id="profilePass" placeholder="Kosongkan jika tidak ingin ganti"></div>
         <div class="form-group"><label>Konfirmasi Password</label><input type="password" id="profilePassConfirm" placeholder="Ulangi password baru"></div>
         <button class="btn btn-primary" onclick="saveProfile()">Simpan Perubahan</button>
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+          <p style="font-size:.82rem;font-weight:700;color:var(--text-muted);margin-bottom:10px">📦 SYNC DATA DARI GURU</p>
+          <p style="font-size:.78rem;color:var(--text-muted);margin-bottom:10px">Minta file export dari guru, lalu import di sini agar tugas-tugas terbaru muncul di HP kamu.</p>
+          <label class="btn btn-secondary" style="cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+            ⬆️ Import Data dari Guru
+            <input type="file" accept=".json" style="display:none" onchange="importDataSiswa(this)">
+          </label>
+        </div>
       </div>
     </div>
 

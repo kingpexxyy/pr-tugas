@@ -436,12 +436,15 @@ body.dark .deadline-banner .banner-text span{color:#fcd34d}
   .stat-card .stat-value { font-size: 1.6rem; }
   /* Single column task cards */
   .task-grid { grid-template-columns: 1fr; gap: 12px; }
-  /* Full width modal */
-  .modal-overlay { padding: 12px; align-items: flex-end; }
+  /* Full width modal — slide from bottom, scrollable */
+  .modal-overlay { padding: 0; align-items: flex-end; }
   .modal {
     border-radius: 20px 20px 0 0;
-    max-height: 85vh;
-    padding: 24px 20px;
+    max-height: 92vh;
+    height: auto;
+    padding: 20px 18px 24px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .modal-wide { max-width: 100%; }
   /* Page header compact */
