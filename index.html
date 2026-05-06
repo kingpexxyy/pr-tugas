@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TugasKu - Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Plus Jakarta Sans', 'ui-sans-serif', 'system-ui'] },
+          colors: {
+            primary: { DEFAULT: '#6366f1', dark: '#4f46e5', light: '#eef2ff' }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui; }
+    @keyframes scaleIn { from { opacity:0; transform:scale(0.94) translateY(10px); } to { opacity:1; transform:scale(1) translateY(0); } }
+    .animate-scale-in { animation: scaleIn 0.4s cubic-bezier(0.4,0,0.2,1); }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-600 to-purple-800 flex items-center justify-center p-4 relative overflow-hidden">
+
+  <!-- decorative blobs -->
+  <div class="absolute w-96 h-96 bg-white/5 rounded-full -top-32 -right-32 pointer-events-none"></div>
+  <div class="absolute w-64 h-64 bg-white/5 rounded-full -bottom-16 -left-16 pointer-events-none"></div>
+
+  <div class="bg-white rounded-3xl p-10 w-full max-w-md shadow-2xl relative z-10 animate-scale-in">
+
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg shadow-indigo-300">📚</div>
+      <h1 class="text-2xl font-extrabold text-gray-900">TugasKu</h1>
+      <p class="text-gray-500 text-sm mt-1">Platform Pengumpulan Tugas Digital</p>
+    </div>
+
+    <!-- Role Tabs -->
+    <div class="flex bg-gray-100 rounded-xl p-1 mb-7 gap-1">
+      <button id="tabSiswa" onclick="setRole('siswa')"
+        class="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all bg-white text-indigo-600 shadow-sm">
+        🎒 Siswa
+      </button>
+      <button id="tabGuru" onclick="setRole('guru')"
+        class="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all text-gray-500">
+        👨‍🏫 Guru
+      </button>
+    </div>
+
+    <!-- Form -->
+    <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+      <div>
+        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Username</label>
+        <input type="text" id="username" placeholder="Masukkan username" required
+          class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm outline-none transition-all focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Password</label>
+        <input type="password" id="password" placeholder="Masukkan password" required
+          class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm outline-none transition-all focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
+      </div>
+      <div id="errorMsg" class="text-red-500 text-sm text-center hidden"></div>
+      <button type="submit"
+        class="w-full py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 hover:-translate-y-0.5 hover:shadow-xl transition-all mt-2">
+        Masuk
+      </button>
+    </form>
+
+    <p class="text-center mt-5 text-xs text-gray-400">Demo: guru1/guru123 atau siswa1/siswa123</p>
+  </div>
+
+  <script src="auth.js"></script>
+</body>
+</html>
