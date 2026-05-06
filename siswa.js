@@ -2,8 +2,10 @@
 const currentUser = JSON.parse(sessionStorage.getItem('user') || 'null');
 if (!currentUser || currentUser.role !== 'siswa') window.location.href = 'index.html';
 
-// Load Sheets config from URL hash if shared via link
-SheetsAPI.loadFromHash();
+// ===== FIREBASE HELPERS =====
+function fbSaveSubmission(sub) {
+  return window._fbSet(window._fbRef(window._fbDB, `submissions/${sub.id}`), sub);
+}
 
 // ===== STATE =====
 let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
@@ -25,12 +27,38 @@ document.getElementById('sidebarClass').textContent = currentUser.class || 'Sisw
 document.getElementById('profileName').value = currentUser.name;
 document.getElementById('profileClass').value = currentUser.class || '';
 applyDark();
-updateStats();
-renderUrgentTasks();
-renderStreak();
-populateFilters();
+
+function initFirebaseListeners() {
+  window._fbOnValue(window._fbRef(window._fbDB, 'tasks'), snap => {
+    const data = snap.val() || {};
+    tasks = Object.values(data).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+    updateStats(); renderUrgentTasks(); renderStreak(); populateFilters();
+    if (document.getElementById('page-tugas').style.display !== 'none') renderTasks();
+    if (document.getElementById('page-kalender').style.display !== 'none') renderCalendar();
+  });
+  window._fbOnValue(window._fbRef(window._fbDB, 'submissions'), snap => {
+    const data = snap.val() || {};
+    submissions = Object.values(data);
+    mySubmissions = submissions.filter(s => s.studentUsername === currentUser.username);
+    localStorage.setItem('submissions', JSON.stringify(submissions));
+    updateStats(); renderUrgentTasks(); renderStreak();
+    if (document.getElementById('page-tugas').style.display !== 'none') renderTasks();
+    if (document.getElementById('page-riwayat').style.display !== 'none') renderRiwayat();
+  });
+  window._fbOnValue(window._fbRef(window._fbDB, 'feedbacks'), snap => {
+    const data = snap.val() || {};
+    localStorage.setItem('feedbacks', JSON.stringify(Object.values(data)));
+  });
+}
+
+if (window._fbReady) {
+  initFirebaseListeners();
+} else {
+  document.addEventListener('firebase-ready', initFirebaseListeners);
+}
+
 requestNotifPermission();
-setInterval(autoRefresh, 8000);
 startCountdownTimers();
 
 // ===== DARK MODE =====
@@ -380,12 +408,9 @@ async function submitHomework(e) {
     note, fileName: selectedFile ? selectedFile.name : null,
     isLate, source: 'web', submittedAt: new Date().toISOString()
   };
-  submissions.push(submission); mySubmissions.push(submission);
-  localStorage.setItem('submissions', JSON.stringify(submissions));
-  closeSubmitModal(); updateStats(); renderUrgentTasks(); renderStreak();
+  await fbSaveSubmission(submission); // Firebase listener auto-updates submissions + UI
+  closeSubmitModal();
   showToast('✅ Tugas berhasil dikumpulkan!', 'success');
-  if (document.getElementById('page-tugas').style.display !== 'none') renderTasks();
-  if (document.getElementById('page-riwayat').style.display !== 'none') renderRiwayat();
   if (SheetsAPI.isConnected()) await SheetsAPI.updateStatus(submission);
 }
 
@@ -488,13 +513,13 @@ function deletePersonalTask(id) {
 // ===== KALENDER =====
 function renderCalendar() {
   const stored = localStorage.getItem('calMonth');
-  const ref = stored ? new Date(stored) : new Date();
-  renderCalendarMonth(ref);
+  const calRef = stored ? new Date(stored) : new Date();
+  renderCalendarMonth(calRef);
 }
 
-function renderCalendarMonth(ref) {
-  localStorage.setItem('calMonth', ref.toISOString());
-  const year = ref.getFullYear(), month = ref.getMonth();
+function renderCalendarMonth(calRef) {
+  localStorage.setItem('calMonth', calRef.toISOString());
+  const year = calRef.getFullYear(), month = calRef.getMonth();
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const today = new Date();
@@ -558,9 +583,9 @@ function renderCalendarMonth(ref) {
 
 function changeMonth(dir) {
   const stored = localStorage.getItem('calMonth');
-  const ref = stored ? new Date(stored) : new Date();
-  ref.setMonth(ref.getMonth() + dir);
-  renderCalendarMonth(ref);
+  const calRef = stored ? new Date(stored) : new Date();
+  calRef.setMonth(calRef.getMonth() + dir);
+  renderCalendarMonth(calRef);
 }
 
 // ===== RIWAYAT =====

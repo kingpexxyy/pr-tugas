@@ -153,6 +153,8 @@ const SheetsAPI = {
   }
 };
 
+window.SheetsAPI = SheetsAPI;
+
 /**
  * ============================================================
  * COPY KODE INI KE GOOGLE APPS SCRIPT (Kode.gs) — GANTI SEMUA

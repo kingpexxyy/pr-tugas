@@ -2,8 +2,29 @@
 const currentUser = JSON.parse(sessionStorage.getItem('user') || 'null');
 if (!currentUser || currentUser.role !== 'guru') window.location.href = 'index.html';
 
-// Load Sheets config from URL hash if shared via link
-SheetsAPI.loadFromHash();
+// ===== FIREBASE HELPERS (uses globals set by inline module in HTML) =====
+function fbSaveTask(task) {
+  return window._fbSet(window._fbRef(window._fbDB, `tasks/${task.id}`), task);
+}
+async function fbDeleteTask(id) {
+  await window._fbRemove(window._fbRef(window._fbDB, `tasks/${id}`));
+  const snap = await window._fbGet(window._fbRef(window._fbDB, 'submissions'));
+  const subs = snap.val() || {};
+  await Promise.all(
+    Object.entries(subs)
+      .filter(([,s]) => s.taskId === id)
+      .map(([k]) => window._fbRemove(window._fbRef(window._fbDB, `submissions/${k}`)))
+  );
+}
+function fbSaveSubmission(sub) {
+  return window._fbSet(window._fbRef(window._fbDB, `submissions/${sub.id}`), sub);
+}
+function fbSaveFeedback(fb) {
+  return window._fbSet(window._fbRef(window._fbDB, `feedbacks/${fb.subId}`), fb);
+}
+function fbAddActivity(entry) {
+  return window._fbPush(window._fbRef(window._fbDB, 'activityLog'), entry);
+}
 
 // ===== STATE =====
 let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
@@ -23,12 +44,43 @@ document.getElementById('guruName').textContent = currentUser.name;
 document.getElementById('sidebarName').textContent = currentUser.name;
 document.getElementById('profileName').value = currentUser.name;
 applyDark();
-updateStats();
-renderRecentTasks();
-renderActivityFeed();
-renderDeadlineBanner();
-populateFilters();
 checkSheetsStatus();
+
+// Firebase realtime listeners — data sync otomatis ke semua device
+function initFirebaseListeners() {
+  window._fbOnValue(window._fbRef(window._fbDB, 'tasks'), snap => {
+    const data = snap.val() || {};
+    tasks = Object.values(data).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+    updateStats(); renderRecentTasks(); renderDeadlineBanner(); populateFilters();
+    if (document.getElementById('page-tugas').style.display !== 'none') renderTaskTable();
+  });
+  window._fbOnValue(window._fbRef(window._fbDB, 'submissions'), snap => {
+    const data = snap.val() || {};
+    submissions = Object.values(data).sort((a,b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+    localStorage.setItem('submissions', JSON.stringify(submissions));
+    updateStats();
+    if (document.getElementById('page-pengumpulan').style.display !== 'none') renderSubmissions();
+    if (document.getElementById('page-statistik').style.display !== 'none') renderStatistik();
+  });
+  window._fbOnValue(window._fbRef(window._fbDB, 'feedbacks'), snap => {
+    const data = snap.val() || {};
+    feedbacks = Object.values(data);
+    localStorage.setItem('feedbacks', JSON.stringify(feedbacks));
+  });
+  window._fbOnValue(window._fbRef(window._fbDB, 'activityLog'), snap => {
+    const data = snap.val() || {};
+    activityLog = Object.values(data).sort((a,b) => new Date(b.time) - new Date(a.time)).slice(0,20);
+    localStorage.setItem('activityLog', JSON.stringify(activityLog));
+    renderActivityFeed();
+  });
+}
+
+if (window._fbReady) {
+  initFirebaseListeners();
+} else {
+  document.addEventListener('firebase-ready', initFirebaseListeners);
+}
 
 // ===== DARK MODE =====
 function applyDark() {
@@ -112,12 +164,8 @@ function renderDeadlineBanner() {
 
 // ===== ACTIVITY FEED =====
 function addActivity(type, text, sub) {
-  const icons = { task: '📋', submit: '📥', delete: '🗑️' };
-  const colors = { task: 'var(--primary-light)', submit: 'var(--success-light)', delete: 'var(--danger-light)' };
-  activityLog.unshift({ type, text, sub: sub || '', time: new Date().toISOString() });
-  if (activityLog.length > 20) activityLog.pop();
-  localStorage.setItem('activityLog', JSON.stringify(activityLog));
-  renderActivityFeed();
+  const entry = { type, text, sub: sub || '', time: new Date().toISOString() };
+  fbAddActivity(entry); // Firebase listener will update activityLog + renderActivityFeed
 }
 
 function renderActivityFeed() {
@@ -320,24 +368,19 @@ async function submitTask(e) {
     createdBy: currentUser.name,
     createdAt: new Date().toISOString()
   };
-  tasks.unshift(task);
-  saveTasks();
+  await fbSaveTask(task); // Firebase listener auto-updates tasks + UI
   addActivity('task', `Tugas baru: <strong>${task.title}</strong>`, task.subject);
   closeModal();
-  updateStats(); renderRecentTasks(); renderDeadlineBanner(); populateFilters();
   showToast('✅ Tugas berhasil ditambahkan!', 'success');
   if (SheetsAPI.isConnected()) {
     const ok = await SheetsAPI.addTask(task);
-    showToast(ok ? '🔗 Tersinkron ke Google Sheets' : '⚠️ Gagal sinkron', ok ? 'success' : 'error');
+    showToast(ok ? '🔗 Tersinkron ke Google Sheets' : '⚠️ Gagal sinkron Sheets', ok ? 'success' : 'error');
   }
 }
 async function deleteTask(id) {
   if (!confirm('Hapus tugas ini?')) return;
-  tasks = tasks.filter(t => t.id !== id);
-  submissions = submissions.filter(s => s.taskId !== id);
-  saveTasks(); saveSubmissions();
-  updateStats(); renderRecentTasks(); closeDetailModal();
-  if (document.getElementById('page-tugas').style.display !== 'none') renderTaskTable();
+  await fbDeleteTask(id); // Firebase listener auto-updates tasks + submissions + UI
+  closeDetailModal();
   showToast('🗑️ Tugas dihapus', 'success');
   if (SheetsAPI.isConnected()) await SheetsAPI.deleteTask(id);
 }
@@ -398,12 +441,9 @@ function closeFeedbackModal() { document.getElementById('feedbackModal').classLi
 function saveFeedback() {
   const text = document.getElementById('feedbackText').value.trim();
   if (!text) { showToast('Tulis feedback dulu', 'error'); return; }
-  const existing = feedbacks.findIndex(f => f.subId === currentFeedbackSub);
   const fb = { subId: currentFeedbackSub, text, time: new Date().toISOString() };
-  if (existing >= 0) feedbacks[existing] = fb; else feedbacks.push(fb);
-  localStorage.setItem('feedbacks', JSON.stringify(feedbacks));
+  fbSaveFeedback(fb); // Firebase listener auto-updates feedbacks
   closeFeedbackModal();
-  renderSubmissions();
   showToast('💬 Feedback tersimpan!', 'success');
 }
 

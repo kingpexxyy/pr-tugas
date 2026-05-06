@@ -294,6 +294,30 @@
 
 <div class="toast" id="toast"></div>
 <script src="sheets.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, remove, onValue, push, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+const _app = initializeApp({
+  apiKey:"AIzaSyA-Y0tDvkRx2AErra1obZ6IG9PoLfrRVUA",
+  authDomain:"tugas-68ece.firebaseapp.com",
+  databaseURL:"https://tugas-68ece-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"tugas-68ece",
+  storageBucket:"tugas-68ece.firebasestorage.app",
+  messagingSenderId:"984169338910",
+  appId:"1:984169338910:web:1d068db6eefda034a0360f"
+});
+const _db = getDatabase(_app);
+window._fbDB = _db;
+window._fbRef = ref;
+window._fbSet = set;
+window._fbRemove = remove;
+window._fbOnValue = onValue;
+window._fbPush = push;
+window._fbGet = get;
+// Signal that Firebase is ready
+window._fbReady = true;
+document.dispatchEvent(new Event('firebase-ready'));
+</script>
 <script>
 function setMobileNav(page) {
   document.querySelectorAll('.mobile-nav-item').forEach(b => b.classList.remove('active'));
