@@ -328,7 +328,8 @@ body.dark .deadline-banner .banner-text span{color:#fcd34d}
   bottom: 0; left: 0; right: 0;
   background: linear-gradient(180deg,#1e1b4b,#312e81);
   z-index: 200;
-  padding: 0 4px env(safe-area-inset-bottom,8px);
+  padding: 0 4px;
+  padding-bottom: max(env(safe-area-inset-bottom, 12px), 12px);
   box-shadow: 0 -4px 20px rgba(0,0,0,.2);
 }
 .mobile-nav-inner {
@@ -419,7 +420,7 @@ body.dark .deadline-banner .banner-text span{color:#fcd34d}
   .mobile-topbar { display: flex; }
   .main-content {
     margin-left: 0;
-    padding: 72px 16px 80px;
+    padding: 72px 16px 100px;
   }
   /* Stack stats 2x2 on mobile */
   .stats-grid {
@@ -501,7 +502,9 @@ body.dark .deadline-banner .banner-text span{color:#fcd34d}
   #page-tugas > div[style*="display:flex"] .filter-bar { margin: 0 !important; }
   #page-tugas > div[style*="display:flex"] .btn { width: 100%; }
   /* Toast bottom offset for nav */
-  .toast { bottom: 76px; right: 16px; left: 16px; max-width: none; }
+  .toast { bottom: 100px; right: 16px; left: 16px; max-width: none; }
+  /* FAB offset */
+  .mobile-fab { bottom: 90px; }
   /* Filter bar stack */
   .filter-bar { flex-direction: column; }
   .filter-bar input { min-width: unset; }
