@@ -11,7 +11,6 @@ const DEFAULT_USERS = {
   ]
 };
 
-// Merge default dengan perubahan yang disimpan di localStorage
 function getUsers() {
   const overrides = JSON.parse(localStorage.getItem('userOverrides') || '{}');
   const result = { guru: [], siswa: [] };
@@ -29,36 +28,63 @@ let selectedRole = 'siswa';
 function setRole(role) {
   selectedRole = role;
   const tabSiswa = document.getElementById('tabSiswa');
-  const tabGuru = document.getElementById('tabGuru');
+  const tabGuru  = document.getElementById('tabGuru');
   if (!tabSiswa) return;
-  if (role === 'siswa') {
-    tabSiswa.className = 'flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all bg-white text-indigo-600 shadow-sm';
-    tabGuru.className = 'flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all text-gray-500';
-  } else {
-    tabGuru.className = 'flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all bg-white text-indigo-600 shadow-sm';
-    tabSiswa.className = 'flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all text-gray-500';
-  }
+  tabSiswa.classList.toggle('active', role === 'siswa');
+  tabGuru.classList.toggle('active',  role === 'guru');
 }
 
 function handleLogin(e) {
   e.preventDefault();
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value;
-  const errorEl = document.getElementById('errorMsg');
+  const errorEl  = document.getElementById('errorMsg');
+  const btn      = document.getElementById('submitBtn');
 
-  const USERS = getUsers();
-  const users = USERS[selectedRole] || [];
-  const user = users.find(u => u.username === username && u.password === password);
+  // Loading state
+  btn.classList.add('loading');
+  btn.textContent = 'Masuk';
 
-  if (!user) {
-    errorEl.textContent = 'Username atau password salah.';
-    errorEl.classList.remove('hidden');
-    return;
-  }
+  // Simulate slight delay for UX feel
+  setTimeout(() => {
+    const USERS = getUsers();
+    const users = USERS[selectedRole] || [];
+    const user  = users.find(u => u.username === username && u.password === password);
 
-  errorEl.classList.add('hidden');
-  sessionStorage.setItem('user', JSON.stringify({ ...user, role: selectedRole }));
-  window.location.href = selectedRole === 'guru' ? 'guru.html' : 'siswa.html';
+    btn.classList.remove('loading');
+
+    if (!user) {
+      errorEl.textContent = 'Username atau password salah.';
+      errorEl.style.display = 'block';
+      // Re-trigger shake animation
+      errorEl.style.animation = 'none';
+      void errorEl.offsetWidth;
+      errorEl.style.animation = '';
+      // Shake inputs
+      const inputs = document.querySelectorAll('.field input');
+      inputs.forEach(inp => {
+        inp.style.borderColor = 'rgba(252,165,165,.8)';
+        inp.style.animation = 'none';
+        void inp.offsetWidth;
+        inp.style.animation = 'shake .4s cubic-bezier(.36,.07,.19,.97)';
+        setTimeout(() => { inp.style.borderColor = ''; inp.style.animation = ''; }, 500);
+      });
+      return;
+    }
+
+    errorEl.style.display = 'none';
+
+    // Success animation — card scale out
+    const card = document.querySelector('.card');
+    card.style.transition = 'transform .3s cubic-bezier(.4,0,1,1), opacity .3s ease';
+    card.style.transform = 'scale(.95) translateY(-10px)';
+    card.style.opacity = '0';
+
+    setTimeout(() => {
+      sessionStorage.setItem('user', JSON.stringify({ ...user, role: selectedRole }));
+      window.location.href = selectedRole === 'guru' ? 'guru.html' : 'siswa.html';
+    }, 300);
+  }, 400);
 }
 
 // Guard: redirect if already logged in
