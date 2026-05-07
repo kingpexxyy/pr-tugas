@@ -506,29 +506,40 @@ async function submitHomework(e) {
   // Upload file ke Firebase Storage jika ada
   if (selectedFile && window._fbStorage) {
     try {
-      showToast('📤 Mengupload file...', '');
+      showToast('📤 Mengupload file...', 'warning');
       const filePath = `submissions/${currentUser.username}/${taskId}_${Date.now()}_${selectedFile.name}`;
       const storageRef = window._fbStorageRef(window._fbStorage, filePath);
       const uploadTask = window._fbUpload(storageRef, selectedFile);
 
       fileURL = await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error('Upload timeout')), 30000);
         uploadTask.on('state_changed',
           snapshot => {
             const pct = Math.round(snapshot.bytesTransferred / snapshot.totalBytes * 100);
             if (submitBtn) submitBtn.textContent = `⏳ Upload ${pct}%...`;
           },
-          reject,
+          err => { clearTimeout(timeout); reject(err); },
           async () => {
-            const url = await window._fbGetDownloadURL(uploadTask.snapshot.ref);
-            resolve(url);
+            clearTimeout(timeout);
+            try {
+              const url = await window._fbGetDownloadURL(uploadTask.snapshot.ref);
+              resolve(url);
+            } catch(e) { reject(e); }
           }
         );
       });
       fileName = selectedFile.name;
+      showToast('✅ File terupload!', 'success');
     } catch(err) {
       console.error('Upload error:', err);
-      showToast('⚠️ Gagal upload file, tetap mengumpulkan tanpa file', 'warning');
+      // Tetap kumpulkan tanpa file
+      fileName = selectedFile ? selectedFile.name : null;
+      fileURL = null;
+      showToast('⚠️ File gagal diupload, tugas tetap dikumpulkan', 'warning');
     }
+  } else if (selectedFile) {
+    // Storage tidak tersedia, simpan nama file saja
+    fileName = selectedFile.name;
   }
 
   const isLate = task && new Date() > new Date(task.deadline);

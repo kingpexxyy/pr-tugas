@@ -1590,3 +1590,9 @@ span[style*="background:#ede9fe"],
 div[style*="background:#ede9fe"] { background: rgba(139,92,246,.2) !important; }
 span[style*="color:#7c3aed"] { color: #c4b5fd !important; }
 div[style*="background:var(--success-light)"] { background: rgba(16,185,129,.15) !important; color: #6ee7b7 !important; }
+
+/* ── Toast fix — always readable ── */
+.toast { background: rgba(15,12,41,.95) !important; color: #f1f5f9 !important; border: 1px solid rgba(255,255,255,.15) !important; backdrop-filter: blur(20px) !important; }
+.toast.success { background: rgba(16,185,129,.9) !important; color: #fff !important; border-color: rgba(16,185,129,.4) !important; }
+.toast.error   { background: rgba(239,68,68,.9)  !important; color: #fff !important; border-color: rgba(239,68,68,.4)  !important; }
+.toast.warning { background: rgba(245,158,11,.9) !important; color: #fff !important; border-color: rgba(245,158,11,.4) !important; }

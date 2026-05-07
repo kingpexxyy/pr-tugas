@@ -549,17 +549,17 @@ function openSubmissionDetail(subId) {
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <div style="flex:1;min-width:0">
           <div style="font-weight:700;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.fileName || 'File'}</div>
-          <div style="font-size:.75rem;color:var(--text-muted);margin-top:2px">Klik tombol untuk membuka</div>
+          <div style="font-size:.75rem;color:var(--text-muted);margin-top:2px">Klik tombol untuk membuka atau mengunduh</div>
         </div>
         <div style="display:flex;gap:8px;flex-shrink:0">
-          <a href="${s.fileURL}" target="_blank" rel="noopener"
+          <a href="${s.fileURL}" target="_blank" rel="noopener noreferrer"
              style="padding:9px 16px;background:var(--primary);color:#fff;border-radius:10px;font-size:.82rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:6px">
             👁️ Buka
           </a>
-          <a href="${s.fileURL}" download="${s.fileName || 'file'}"
-             style="padding:9px 16px;background:rgba(255,255,255,.1);color:var(--text);border:1px solid var(--border);border-radius:10px;font-size:.82rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:6px">
+          <button onclick="downloadFile('${s.fileURL}','${(s.fileName||'file').replace(/'/g,"\\'")}',this)"
+             style="padding:9px 16px;background:rgba(255,255,255,.1);color:var(--text);border:1px solid rgba(255,255,255,.15);border-radius:10px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px">
             ⬇️ Download
-          </a>
+          </button>
         </div>
       </div>
     </div>` : `
@@ -578,6 +578,29 @@ function openSubmissionDetail(subId) {
   document.getElementById('submissionDetailModal').classList.add('open');
 }
 function closeSubmissionDetail() { closeModalAnimated('submissionDetailModal'); }
+
+// Download file via fetch → blob (bypass CORS download restriction)
+async function downloadFile(url, filename, btn) {
+  const orig = btn.innerHTML;
+  btn.innerHTML = '⏳ ...';
+  btn.disabled = true;
+  try {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    showToast('⬇️ File didownload!', 'success');
+  } catch(e) {
+    // Fallback: buka di tab baru
+    window.open(url, '_blank');
+    showToast('⚠️ Membuka di tab baru', 'warning');
+  }
+  btn.innerHTML = orig;
+  btn.disabled = false;
+}
 
 // ===== FEEDBACK =====
 function openFeedbackModal(subId) {
