@@ -49,6 +49,24 @@ document.getElementById('profileName').value = currentUser.name;
 applyDark();
 checkSheetsStatus();
 
+// Load nama terbaru dari Firebase (sync antar device)
+function loadUserProfile() {
+  if (!window._fbDB) return;
+  window._fbOnValue(window._fbRef(window._fbDB, `users/guru_${currentUser.username}`), snap => {
+    const data = snap.val();
+    if (!data) return;
+    if (data.name && data.name !== currentUser.name) {
+      currentUser.name = data.name;
+      sessionStorage.setItem('user', JSON.stringify(currentUser));
+      document.getElementById('guruName').textContent = data.name;
+      document.getElementById('sidebarName').textContent = data.name;
+      document.getElementById('profileName').value = data.name;
+    }
+  }, { onlyOnce: false });
+}
+if (window._fbReady) loadUserProfile();
+else document.addEventListener('firebase-ready', loadUserProfile);
+
 // Firebase realtime listeners — data sync otomatis ke semua device
 function initFirebaseListeners() {
   // Loading state on first open
@@ -563,20 +581,34 @@ function renderStatistik() {
 }
 
 // ===== PROFIL =====
-function saveProfile() {
+async function saveProfile() {
   const name = document.getElementById('profileName').value.trim();
   const pass = document.getElementById('profilePass').value;
   const confirm = document.getElementById('profilePassConfirm').value;
   if (!name) { showToast('Nama tidak boleh kosong', 'error'); return; }
   if (pass && pass !== confirm) { showToast('Password tidak cocok', 'error'); return; }
+
   currentUser.name = name;
   if (pass) currentUser.password = pass;
   sessionStorage.setItem('user', JSON.stringify(currentUser));
-  // Simpan override ke localStorage agar login berikutnya pakai data baru
+
+  // Simpan ke localStorage (fallback)
   const overrides = JSON.parse(localStorage.getItem('userOverrides') || '{}');
   const key = 'guru_' + currentUser.username;
   overrides[key] = { name, ...(pass ? { password: pass } : {}) };
   localStorage.setItem('userOverrides', JSON.stringify(overrides));
+
+  // Simpan ke Firebase supaya sync ke semua device
+  if (window._fbDB) {
+    await window._fbSet(window._fbRef(window._fbDB, `users/guru_${currentUser.username}`), {
+      name,
+      username: currentUser.username,
+      role: 'guru',
+      updatedAt: new Date().toISOString()
+    });
+  }
+
+  // Update UI
   document.getElementById('guruName').textContent = name;
   document.getElementById('sidebarName').textContent = name;
   document.getElementById('profilePass').value = '';

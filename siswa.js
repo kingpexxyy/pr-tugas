@@ -30,6 +30,29 @@ document.getElementById('profileName').value = currentUser.name;
 document.getElementById('profileClass').value = currentUser.class || '';
 applyDark();
 
+// Load nama terbaru dari Firebase (sync antar device)
+function loadUserProfile() {
+  if (!window._fbDB) return;
+  window._fbOnValue(window._fbRef(window._fbDB, `users/siswa_${currentUser.username}`), snap => {
+    const data = snap.val();
+    if (!data) return;
+    if (data.name && data.name !== currentUser.name) {
+      currentUser.name = data.name;
+      if (data.class) currentUser.class = data.class;
+      sessionStorage.setItem('user', JSON.stringify(currentUser));
+      document.getElementById('siswaName').textContent = data.name;
+      document.getElementById('sidebarName').textContent = data.name;
+      document.getElementById('profileName').value = data.name;
+      if (data.class) {
+        document.getElementById('sidebarClass').textContent = data.class;
+        document.getElementById('profileClass').value = data.class;
+      }
+    }
+  }, { onlyOnce: false });
+}
+if (window._fbReady) loadUserProfile();
+else document.addEventListener('firebase-ready', loadUserProfile);
+
 function initFirebaseListeners() {
   // Show loading indicator
   const grid = document.getElementById('urgentTasksGrid');
@@ -688,21 +711,37 @@ function renderRiwayat() {
 }
 
 // ===== PROFIL =====
-function saveProfile() {
+async function saveProfile() {
   const name = document.getElementById('profileName').value.trim();
   const kelas = document.getElementById('profileClass').value.trim();
   const pass = document.getElementById('profilePass').value;
   const confirm = document.getElementById('profilePassConfirm').value;
   if (!name) { showToast('Nama tidak boleh kosong', 'error'); return; }
   if (pass && pass !== confirm) { showToast('Password tidak cocok', 'error'); return; }
-  currentUser.name = name; currentUser.class = kelas;
+
+  currentUser.name = name;
+  currentUser.class = kelas;
   if (pass) currentUser.password = pass;
   sessionStorage.setItem('user', JSON.stringify(currentUser));
-  // Simpan override ke localStorage agar login berikutnya pakai data baru
+
+  // Simpan ke localStorage (fallback)
   const overrides = JSON.parse(localStorage.getItem('userOverrides') || '{}');
   const key = 'siswa_' + currentUser.username;
   overrides[key] = { name, class: kelas, ...(pass ? { password: pass } : {}) };
   localStorage.setItem('userOverrides', JSON.stringify(overrides));
+
+  // Simpan ke Firebase supaya sync ke semua device
+  if (window._fbDB) {
+    await window._fbSet(window._fbRef(window._fbDB, `users/siswa_${currentUser.username}`), {
+      name,
+      class: kelas,
+      username: currentUser.username,
+      role: 'siswa',
+      updatedAt: new Date().toISOString()
+    });
+  }
+
+  // Update UI
   document.getElementById('siswaName').textContent = name;
   document.getElementById('sidebarName').textContent = name;
   document.getElementById('sidebarClass').textContent = kelas || 'Siswa';
