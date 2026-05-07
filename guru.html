@@ -349,35 +349,11 @@ function setMobileNav(page) {
   document.querySelectorAll('.mobile-nav-item').forEach(b => b.classList.remove('active'));
   const el = document.getElementById('mn-' + page);
   if (el) el.classList.add('active');
-  // Show/hide FAB only on tugas page
   const fab = document.getElementById('mobileFab');
   if (fab) fab.style.display = (window.innerWidth <= 768 && (page === 'tugas' || page === 'dashboard')) ? 'flex' : 'none';
   const mi = document.getElementById('darkIconMobile');
   if (mi) mi.textContent = localStorage.getItem('darkMode') === '1' ? '☀️' : '🌙';
 }
-
-// Fix: lock bottom nav position when browser chrome hides/shows
-(function() {
-  const nav = document.querySelector('.mobile-nav');
-  if (!nav || window.innerWidth > 768) return;
-  function lockNav() {
-    const vh = window.innerHeight;
-    nav.style.position = 'fixed';
-    nav.style.bottom = '0px';
-    nav.style.top = 'auto';
-  }
-  lockNav();
-  window.addEventListener('resize', lockNav);
-  window.addEventListener('scroll', lockNav, { passive: true });
-  // Visual viewport API — most reliable for mobile browser chrome
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', function() {
-      nav.style.top = (window.visualViewport.offsetTop + window.visualViewport.height - nav.offsetHeight) + 'px';
-      nav.style.bottom = 'auto';
-      nav.style.position = 'fixed';
-    });
-  }
-})();
 </script>
 <script src="guru.js"></script>
 <script>
