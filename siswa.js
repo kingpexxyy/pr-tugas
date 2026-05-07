@@ -503,43 +503,47 @@ async function submitHomework(e) {
   let fileURL = null;
   let fileName = null;
 
-  // Upload file ke Firebase Storage jika ada
-  if (selectedFile && window._fbStorage) {
+  // Upload file ke Cloudinary jika ada
+  if (selectedFile) {
     try {
       showToast('📤 Mengupload file...', 'warning');
-      const filePath = `submissions/${currentUser.username}/${taskId}_${Date.now()}_${selectedFile.name}`;
-      const storageRef = window._fbStorageRef(window._fbStorage, filePath);
-      const uploadTask = window._fbUpload(storageRef, selectedFile);
+      if (submitBtn) submitBtn.textContent = '⏳ Mengupload...';
+
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      formData.append('upload_preset', 'tugasku-upload');
+      formData.append('folder', `submissions/${currentUser.username}`);
+
+      const xhr = new XMLHttpRequest();
+      xhr.upload.onprogress = e => {
+        if (e.lengthComputable) {
+          const pct = Math.round(e.loaded / e.total * 100);
+          if (submitBtn) submitBtn.textContent = `⏳ Upload ${pct}%...`;
+        }
+      };
 
       fileURL = await new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => reject(new Error('Upload timeout')), 30000);
-        uploadTask.on('state_changed',
-          snapshot => {
-            const pct = Math.round(snapshot.bytesTransferred / snapshot.totalBytes * 100);
-            if (submitBtn) submitBtn.textContent = `⏳ Upload ${pct}%...`;
-          },
-          err => { clearTimeout(timeout); reject(err); },
-          async () => {
-            clearTimeout(timeout);
-            try {
-              const url = await window._fbGetDownloadURL(uploadTask.snapshot.ref);
-              resolve(url);
-            } catch(e) { reject(e); }
+        xhr.onload = () => {
+          if (xhr.status === 200) {
+            const res = JSON.parse(xhr.responseText);
+            resolve(res.secure_url);
+          } else {
+            reject(new Error('Upload gagal: ' + xhr.status));
           }
-        );
+        };
+        xhr.onerror = () => reject(new Error('Network error'));
+        xhr.open('POST', 'https://api.cloudinary.com/v1_1/diqc3izrr/auto/upload');
+        xhr.send(formData);
       });
+
       fileName = selectedFile.name;
       showToast('✅ File terupload!', 'success');
     } catch(err) {
       console.error('Upload error:', err);
-      // Tetap kumpulkan tanpa file
-      fileName = selectedFile ? selectedFile.name : null;
+      fileName = selectedFile.name;
       fileURL = null;
       showToast('⚠️ File gagal diupload, tugas tetap dikumpulkan', 'warning');
     }
-  } else if (selectedFile) {
-    // Storage tidak tersedia, simpan nama file saja
-    fileName = selectedFile.name;
   }
 
   const isLate = task && new Date() > new Date(task.deadline);
