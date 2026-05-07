@@ -1899,3 +1899,109 @@ body:not(.dark) div[style*="background:var(--bg)"] {
   will-change: auto !important;
   transition: background .4s ease !important;
 }
+
+/* ============================================================
+   RESPONSIVE BREAKPOINTS — proper device support
+   Mobile  : < 640px
+   Tablet  : 640px – 1024px
+   Desktop : > 1024px
+   ============================================================ */
+
+/* ── Tablet (640–1024px) — sidebar narrow, content adapts ── */
+@media(min-width:640px) and (max-width:1024px) {
+  :root { --sidebar-w: 200px; }
+
+  .sidebar .brand h2 { font-size: .95rem; }
+  .sidebar .brand p  { display: none; }
+  .sidebar nav a     { font-size: .82rem; padding: 10px 12px; }
+  .sidebar .user-info .info .name { font-size: .82rem; }
+
+  .main-content { padding: 24px 20px; }
+
+  /* Stats — 2 columns on tablet */
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+  /* Task grid — 2 columns */
+  .task-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+  /* Dashboard 2-col layout — stack on tablet */
+  #page-dashboard > div[style*="grid-template-columns:1fr 340px"] {
+    grid-template-columns: 1fr !important;
+  }
+  #page-dashboard > div[style*="grid-template-columns:1fr 200px"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Statistik — stack */
+  #page-statistik > div[style*="grid-template-columns:1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Calendar — stack */
+  #page-kalender > div { grid-template-columns: 1fr !important; }
+
+  /* Page header */
+  .page-header h1 { font-size: 1.4rem; }
+
+  /* Hide mobile nav on tablet */
+  .mobile-nav    { display: none !important; }
+  .mobile-topbar { display: none !important; }
+  .mobile-fab    { display: none !important; }
+
+  /* Table — keep as table on tablet */
+  .table-container { overflow-x: auto; }
+  table { min-width: 500px; }
+  table, thead, tbody, th, td, tr { display: revert; }
+  thead { display: revert; }
+
+  /* Filter bar — wrap nicely */
+  .filter-bar { flex-wrap: wrap; }
+  .filter-bar input { min-width: 160px; }
+}
+
+/* ── Small mobile (< 400px) — extra compact ── */
+@media(max-width:400px) {
+  .main-content { padding: 64px 12px 90px; }
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-card { padding: 12px 10px; }
+  .stat-card .stat-value { font-size: 1.4rem; }
+  .stat-card .stat-icon { width: 36px; height: 36px; font-size: 1.1rem; margin-bottom: 10px; }
+  .page-header h1 { font-size: 1.15rem; }
+  .task-card { padding: 14px; }
+  .clock-time { font-size: 1.1rem; }
+  .clock-date { font-size: .65rem; }
+  .mobile-nav-item { min-height: 52px !important; }
+  .mobile-nav-item .mn-icon { font-size: 1.2rem !important; }
+  .mobile-nav-item span:last-child { font-size: .55rem !important; }
+}
+
+/* ── Large desktop (> 1400px) — wider layout ── */
+@media(min-width:1400px) {
+  :root { --sidebar-w: 280px; }
+  .main-content { padding: 36px 48px; }
+  .stats-grid { grid-template-columns: repeat(4, 1fr); }
+  .task-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+}
+
+/* ── Safe area insets for notch/home indicator devices ── */
+@supports(padding: max(0px)) {
+  .mobile-nav {
+    padding-bottom: max(env(safe-area-inset-bottom), 8px) !important;
+  }
+  .mobile-topbar {
+    padding-top: max(env(safe-area-inset-top), 0px) !important;
+    height: calc(56px + env(safe-area-inset-top, 0px)) !important;
+  }
+  .main-content {
+    padding-left: max(16px, env(safe-area-inset-left)) !important;
+    padding-right: max(16px, env(safe-area-inset-right)) !important;
+  }
+}
+
+/* ── Fluid font sizing ── */
+@media(min-width:640px) and (max-width:1024px) {
+  html { font-size: 15px; }
+}
+@media(max-width:400px) {
+  html { font-size: 14px; }
+}
