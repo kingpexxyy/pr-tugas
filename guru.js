@@ -49,6 +49,15 @@ document.getElementById('profileName').value = currentUser.name;
 applyDark();
 checkSheetsStatus();
 
+// Render dari cache localStorage dulu sambil nunggu Firebase
+const cachedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+const cachedSubs = JSON.parse(localStorage.getItem('submissions') || '[]');
+if (cachedTasks.length) {
+  tasks = cachedTasks;
+  submissions = cachedSubs;
+  updateStats(); renderRecentTasks(); populateFilters();
+}
+
 // Load nama terbaru dari Firebase (sync antar device)
 function loadUserProfile() {
   if (!window._fbDB) return;

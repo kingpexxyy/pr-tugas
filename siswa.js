@@ -30,6 +30,16 @@ document.getElementById('profileName').value = currentUser.name;
 document.getElementById('profileClass').value = currentUser.class || '';
 applyDark();
 
+// Render dari cache localStorage dulu sambil nunggu Firebase
+const cachedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+const cachedSubs = JSON.parse(localStorage.getItem('submissions') || '[]');
+if (cachedTasks.length) {
+  tasks = cachedTasks;
+  submissions = cachedSubs;
+  mySubmissions = submissions.filter(s => s.studentUsername === currentUser.username);
+  updateStats(); renderUrgentTasks(); renderStreak(); populateFilters();
+}
+
 // Load nama terbaru dari Firebase (sync antar device)
 function loadUserProfile() {
   if (!window._fbDB) return;
