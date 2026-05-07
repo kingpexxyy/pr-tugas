@@ -681,6 +681,10 @@ function openAddPersonalModal() {
 function closePersonalModal() {
   closeModalAnimated('addPersonalModal', () => {
     document.getElementById('addPersonalModal').querySelector('form').reset();
+    const lbl = document.getElementById('personalFileLabel');
+    if (lbl) lbl.textContent = 'Klik untuk lampirkan file referensi';
+    const fi = document.getElementById('personalFileInput');
+    if (fi) fi.value = '';
   });
 }
 

@@ -380,10 +380,18 @@ function closeDetailModal() { closeModalAnimated('taskDetailModal'); }
 function closeModal() {
   closeModalAnimated('addTaskModal', () => {
     document.getElementById('addTaskModal').querySelector('form').reset();
+    const lbl = document.getElementById('taskFileLabel');
+    if (lbl) lbl.textContent = 'Klik untuk lampirkan file soal/materi';
   });
 }
 function closeFeedbackModal() {
-  closeModalAnimated('feedbackModal', () => { currentFeedbackSub = null; });
+  closeModalAnimated('feedbackModal', () => {
+    currentFeedbackSub = null;
+    const lbl = document.getElementById('feedbackFileLabel');
+    if (lbl) lbl.textContent = 'Klik untuk lampirkan file koreksi';
+    const fi = document.getElementById('feedbackFileInput');
+    if (fi) fi.value = '';
+  });
 }
 function renderTaskTable() {
   const search = document.getElementById('searchTugas').value.toLowerCase();
@@ -461,6 +469,11 @@ async function uploadToCloudinary(file, onProgress) {
 function openAddModal() {
   const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
   document.getElementById('taskDeadline').min = now.toISOString().slice(0, 16);
+  // Reset file input label
+  const lbl = document.getElementById('taskFileLabel');
+  if (lbl) lbl.textContent = 'Klik untuk lampirkan file soal/materi';
+  const fi = document.getElementById('taskFileInput');
+  if (fi) fi.value = '';
   document.getElementById('addTaskModal').classList.add('open');
 }
 // Remove old individual close functions — replaced by closeModalAnimated above
