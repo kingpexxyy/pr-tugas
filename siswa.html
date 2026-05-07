@@ -179,7 +179,7 @@
       </div>
       <div class="table-container">
         <table>
-          <thead><tr><th>Tugas</th><th>Mapel</th><th>Tenggat</th><th>Waktu Kumpul</th><th>Status</th><th>Catatan</th><th>Feedback Guru</th></tr></thead>
+          <thead><tr><th>Tugas</th><th>Mapel</th><th>Tenggat</th><th>Waktu Kumpul</th><th>Status</th><th>File</th><th>Feedback Guru</th></tr></thead>
           <tbody id="riwayatTableBody"></tbody>
         </table>
       </div>
@@ -258,6 +258,15 @@
       </div>
       <div class="form-group"><label>Catatan / Detail</label><textarea id="personalDesc" rows="3" placeholder="Kerjakan soal no. 1-10..."></textarea></div>
       <div class="form-group"><label>Tenggat Waktu</label><input type="datetime-local" id="personalDeadline" required></div>
+      <div class="form-group">
+        <label>Lampiran (opsional)</label>
+        <div class="submission-area" onclick="document.getElementById('personalFileInput').click()">
+          <div class="upload-icon">📎</div>
+          <p id="personalFileLabel">Klik untuk lampirkan file referensi</p>
+          <input type="file" id="personalFileInput" style="display:none"
+            onchange="document.getElementById('personalFileLabel').textContent=this.files[0]?'📄 '+this.files[0].name:'Klik untuk lampirkan file referensi'">
+        </div>
+      </div>
       <div class="modal-actions">
         <button type="button" class="btn btn-secondary" onclick="closePersonalModal()">Batal</button>
         <button type="submit" class="btn btn-primary">Simpan</button>

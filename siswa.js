@@ -452,6 +452,15 @@ function openTaskDetail(id) {
     </div>
     <p style="font-size:0.82rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Deskripsi Tugas</p>
     <div class="task-detail-desc">${t.description}</div>
+    ${t.attachmentURL ? `
+    <div style="margin-top:16px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);border-radius:14px;padding:14px">
+      <div style="font-size:.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📎 Lampiran dari Guru</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font-weight:600;font-size:.88rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.attachmentName || 'File'}</span>
+        <a href="${t.attachmentURL}" target="_blank" rel="noopener noreferrer"
+           style="padding:7px 14px;background:var(--primary);color:#fff;border-radius:8px;font-size:.8rem;font-weight:700;text-decoration:none">👁️ Buka</a>
+      </div>
+    </div>` : ''}
   `;
 
   const actions = document.getElementById('taskDetailActions');
@@ -622,6 +631,15 @@ function openPersonalDetail(id) {
       </div>
     </div>
     ${t.description ? `<p style="font-size:0.82rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Catatan</p><div class="task-detail-desc" style="border-left-color:#8b5cf6">${t.description}</div>` : ''}
+    ${t.attachmentURL ? `
+    <div style="margin-top:16px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.25);border-radius:14px;padding:14px">
+      <div style="font-size:.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📎 Lampiran</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font-weight:600;font-size:.88rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.attachmentName || 'File'}</span>
+        <a href="${t.attachmentURL}" target="_blank" rel="noopener noreferrer"
+           style="padding:7px 14px;background:#8b5cf6;color:#fff;border-radius:8px;font-size:.8rem;font-weight:700;text-decoration:none">👁️ Buka</a>
+      </div>
+    </div>` : ''}
   `;
   document.getElementById('personalDetailActions').innerHTML = `
     <button class="btn btn-secondary" onclick="closePersonalDetail()">Tutup</button>
@@ -643,9 +661,55 @@ function closePersonalModal() {
   });
 }
 
-function submitPersonalTask(e) {
+// ===== CLOUDINARY UPLOAD HELPER =====
+async function uploadToCloudinary(file, onProgress) {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', 'tugasku-upload');
+  formData.append('folder', `tugasku/${currentUser.username}`);
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.upload.onprogress = e => {
+      if (e.lengthComputable && onProgress) onProgress(Math.round(e.loaded / e.total * 100));
+    };
+    xhr.onload = () => {
+      if (xhr.status === 200) resolve(JSON.parse(xhr.responseText).secure_url);
+      else reject(new Error('Upload gagal: ' + xhr.status));
+    };
+    xhr.onerror = () => reject(new Error('Network error'));
+    xhr.open('POST', 'https://api.cloudinary.com/v1_1/diqc3izrr/auto/upload');
+    xhr.send(formData);
+  });
+}
+
+async function submitPersonalTask(e) {
   e.preventDefault();
-  const task = { id: Date.now().toString(), title: document.getElementById('personalTitle').value.trim(), subject: document.getElementById('personalSubject').value, description: document.getElementById('personalDesc').value.trim(), deadline: document.getElementById('personalDeadline').value, done: false, createdAt: new Date().toISOString() };
+  const btn = document.querySelector('#addPersonalModal .btn-primary');
+
+  let attachmentURL = null, attachmentName = null;
+  const fileInput = document.getElementById('personalFileInput');
+  if (fileInput && fileInput.files[0]) {
+    try {
+      if (btn) btn.textContent = '⏳ Upload 0%...';
+      attachmentURL = await uploadToCloudinary(fileInput.files[0], pct => {
+        if (btn) btn.textContent = `⏳ Upload ${pct}%...`;
+      });
+      attachmentName = fileInput.files[0].name;
+    } catch(err) {
+      showToast('⚠️ File gagal diupload, tugas tetap disimpan', 'warning');
+    }
+  }
+  if (btn) btn.textContent = 'Simpan';
+
+  const task = {
+    id: Date.now().toString(),
+    title: document.getElementById('personalTitle').value.trim(),
+    subject: document.getElementById('personalSubject').value,
+    description: document.getElementById('personalDesc').value.trim(),
+    deadline: document.getElementById('personalDeadline').value,
+    attachmentURL, attachmentName,
+    done: false, createdAt: new Date().toISOString()
+  };
   personalTasks.unshift(task); savePersonalTasks(); closePersonalModal(); renderPersonalTasks(); updateStats();
   showToast('📝 Tugas pribadi ditambahkan!', 'success');
 }
@@ -752,14 +816,20 @@ function renderRiwayat() {
     const task = tasks.find(t => t.id === s.taskId);
     const isLate = s.isLate || (task && new Date(s.submittedAt) > new Date(task.deadline));
     const fb = feedbacks.find(f => f.subId === s.id);
+    const fileChip = s.fileURL
+      ? `<a href="${s.fileURL}" target="_blank" rel="noopener noreferrer" style="color:var(--primary);font-size:.78rem;font-weight:700;text-decoration:none">📎 ${s.fileName||'File'}</a>`
+      : '<span style="color:var(--text-muted);font-size:.8rem">—</span>';
+    const fbChip = fb
+      ? `<div style="font-size:.8rem;color:var(--text-muted)">💬 ${fb.text}${fb.attachmentURL ? ` <a href="${fb.attachmentURL}" target="_blank" rel="noopener noreferrer" style="color:var(--primary);font-weight:700;text-decoration:none">📎</a>` : ''}</div>`
+      : '<span style="color:var(--text-muted);font-size:.8rem">—</span>';
     return `<tr>
       <td><strong>${task ? task.title : s.taskTitle || 'Tugas dihapus'}</strong></td>
       <td>${task ? task.subject : s.subject || '-'}</td>
       <td style="font-size:0.85rem">${task ? formatDate(task.deadline) : '-'}</td>
       <td style="font-size:0.85rem">${formatDate(s.submittedAt)}</td>
       <td>${isLate ? '<span class="badge badge-overdue">Terlambat</span>' : '<span class="badge badge-submitted">Tepat Waktu</span>'}</td>
-      <td style="font-size:0.85rem;color:var(--text-muted)">${s.note || '—'}</td>
-      <td>${fb ? `<span class="feedback-chip" style="cursor:default">💬 ${fb.text}</span>` : '<span style="color:var(--text-muted);font-size:0.8rem">—</span>'}</td>
+      <td>${fileChip}</td>
+      <td>${fbChip}</td>
     </tr>`;
   }).join('');
 }

@@ -333,6 +333,15 @@ function openTaskDetail(id) {
     </div>
     <p style="font-size:0.82rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Deskripsi Tugas</p>
     <div class="task-detail-desc">${t.description}</div>
+    ${t.attachmentURL ? `
+    <div style="margin-top:16px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);border-radius:14px;padding:14px">
+      <div style="font-size:.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📎 Lampiran Tugas</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font-weight:600;font-size:.88rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.attachmentName || 'File'}</span>
+        <a href="${t.attachmentURL}" target="_blank" rel="noopener noreferrer"
+           style="padding:7px 14px;background:var(--primary);color:#fff;border-radius:8px;font-size:.8rem;font-weight:700;text-decoration:none">👁️ Buka</a>
+      </div>
+    </div>` : ''}
     ${cnt > 0 ? `
       <p style="font-size:0.82rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin:16px 0 8px">Siswa yang Sudah Kumpul</p>
       <div style="display:flex;flex-wrap:wrap;gap:8px">
@@ -417,6 +426,28 @@ function populateFilters() {
   sel.innerHTML = '<option value="">Semua Mapel</option>' + subjects.map(s => `<option>${s}</option>`).join('');
 }
 
+// ===== CLOUDINARY UPLOAD HELPER =====
+async function uploadToCloudinary(file, onProgress) {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', 'tugasku-upload');
+  formData.append('folder', `tugasku/${currentUser.username}`);
+
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.upload.onprogress = e => {
+      if (e.lengthComputable && onProgress) onProgress(Math.round(e.loaded / e.total * 100));
+    };
+    xhr.onload = () => {
+      if (xhr.status === 200) resolve(JSON.parse(xhr.responseText).secure_url);
+      else reject(new Error('Upload gagal: ' + xhr.status));
+    };
+    xhr.onerror = () => reject(new Error('Network error'));
+    xhr.open('POST', 'https://api.cloudinary.com/v1_1/diqc3izrr/auto/upload');
+    xhr.send(formData);
+  });
+}
+
 // ===== ADD / DELETE TASK =====
 function openAddModal() {
   const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
@@ -427,6 +458,22 @@ function openAddModal() {
 
 async function submitTask(e) {
   e.preventDefault();
+  const btn = document.querySelector('#addTaskModal .btn-primary');
+
+  let attachmentURL = null, attachmentName = null;
+  const fileInput = document.getElementById('taskFileInput');
+  if (fileInput && fileInput.files[0]) {
+    try {
+      if (btn) btn.textContent = '⏳ Upload 0%...';
+      attachmentURL = await uploadToCloudinary(fileInput.files[0], pct => {
+        if (btn) btn.textContent = `⏳ Upload ${pct}%...`;
+      });
+      attachmentName = fileInput.files[0].name;
+    } catch(err) {
+      showToast('⚠️ File gagal diupload, tugas tetap disimpan', 'warning');
+    }
+  }
+
   const task = {
     id: Date.now().toString(),
     title: document.getElementById('taskTitle').value.trim(),
@@ -434,10 +481,12 @@ async function submitTask(e) {
     description: document.getElementById('taskDesc').value.trim(),
     deadline: document.getElementById('taskDeadline').value,
     estimate: document.getElementById('taskEstimate').value,
+    attachmentURL, attachmentName,
     createdBy: currentUser.name,
     createdAt: new Date().toISOString()
   };
-  await fbSaveTask(task); // Firebase listener auto-updates tasks + UI
+  if (btn) btn.textContent = 'Simpan Tugas';
+  await fbSaveTask(task);
   addActivity('task', `Tugas baru: <strong>${task.title}</strong>`, task.subject);
   closeModal();
   showToast('✅ Tugas berhasil ditambahkan!', 'success');
@@ -539,7 +588,10 @@ function openSubmissionDetail(subId) {
       ${fb ? `
       <div class="task-detail-row" style="align-items:flex-start">
         <span class="label">💬 Feedback</span>
-        <span style="flex:1;color:var(--primary);font-weight:600">${fb.text}</span>
+        <div style="flex:1">
+          <span style="color:var(--primary);font-weight:600">${fb.text}</span>
+          ${fb.attachmentURL ? `<div style="margin-top:6px"><a href="${fb.attachmentURL}" target="_blank" rel="noopener noreferrer" style="color:var(--primary);font-size:.8rem;font-weight:700;text-decoration:none">📎 ${fb.attachmentName||'Lampiran koreksi'}</a></div>` : ''}
+        </div>
       </div>` : ''}
     </div>
 
@@ -613,11 +665,28 @@ function openFeedbackModal(subId) {
   document.getElementById('feedbackModal').classList.add('open');
 }
 
-function saveFeedback() {
+async function saveFeedback() {
   const text = document.getElementById('feedbackText').value.trim();
   if (!text) { showToast('Tulis feedback dulu', 'error'); return; }
-  const fb = { subId: currentFeedbackSub, text, time: new Date().toISOString() };
-  fbSaveFeedback(fb); // Firebase listener auto-updates feedbacks
+
+  const btn = document.querySelector('#feedbackModal .btn-primary');
+  let attachmentURL = null, attachmentName = null;
+  const fileInput = document.getElementById('feedbackFileInput');
+  if (fileInput && fileInput.files[0]) {
+    try {
+      if (btn) btn.textContent = '⏳ Upload...';
+      attachmentURL = await uploadToCloudinary(fileInput.files[0], pct => {
+        if (btn) btn.textContent = `⏳ ${pct}%...`;
+      });
+      attachmentName = fileInput.files[0].name;
+    } catch(err) {
+      showToast('⚠️ File gagal diupload', 'warning');
+    }
+  }
+  if (btn) btn.textContent = 'Kirim Feedback';
+
+  const fb = { subId: currentFeedbackSub, text, attachmentURL, attachmentName, time: new Date().toISOString() };
+  fbSaveFeedback(fb);
   closeFeedbackModal();
   showToast('💬 Feedback tersimpan!', 'success');
 }

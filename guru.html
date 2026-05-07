@@ -261,6 +261,14 @@
           <option value="3+ jam">3+ jam</option>
         </select>
       </div>
+      <div class="form-group">
+        <label>Lampiran (opsional)</label>
+        <div class="submission-area" onclick="document.getElementById('taskFileInput').click()">
+          <div class="upload-icon">📎</div>
+          <p id="taskFileLabel">Klik untuk lampirkan file soal/materi</p>
+          <input type="file" id="taskFileInput" style="display:none" onchange="document.getElementById('taskFileLabel').textContent=this.files[0]?'📄 '+this.files[0].name:'Klik untuk lampirkan file soal/materi'">
+        </div>
+      </div>
       <div class="modal-actions">
         <button type="button" class="btn btn-secondary" onclick="closeModal()">Batal</button>
         <button type="submit" class="btn btn-primary">Simpan Tugas</button>
@@ -286,6 +294,14 @@
     <h2>💬 Beri Feedback</h2>
     <div id="feedbackInfo" style="background:var(--bg);border-radius:10px;padding:12px;margin-bottom:16px;font-size:0.88rem"></div>
     <div class="form-group"><label>Feedback / Komentar</label><textarea id="feedbackText" rows="3" placeholder="Tulis feedback untuk siswa..."></textarea></div>
+    <div class="form-group">
+      <label>Lampiran Koreksi (opsional)</label>
+      <div class="submission-area" onclick="document.getElementById('feedbackFileInput').click()">
+        <div class="upload-icon">📎</div>
+        <p id="feedbackFileLabel">Klik untuk lampirkan file koreksi</p>
+        <input type="file" id="feedbackFileInput" style="display:none" onchange="document.getElementById('feedbackFileLabel').textContent=this.files[0]?'📄 '+this.files[0].name:'Klik untuk lampirkan file koreksi'">
+      </div>
+    </div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeFeedbackModal()">Batal</button>
       <button class="btn btn-primary" onclick="saveFeedback()">Kirim Feedback</button>
