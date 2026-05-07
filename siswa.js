@@ -496,17 +496,56 @@ async function submitHomework(e) {
   const note = document.getElementById('submitNote').value.trim();
   const task = tasks.find(t => t.id === taskId);
   if (mySubmissions.find(s => s.taskId === taskId)) { showToast('Kamu sudah mengumpulkan tugas ini!', 'error'); return; }
+
+  const submitBtn = document.querySelector('#submitModal .btn-primary');
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '⏳ Mengupload...'; }
+
+  let fileURL = null;
+  let fileName = null;
+
+  // Upload file ke Firebase Storage jika ada
+  if (selectedFile && window._fbStorage) {
+    try {
+      showToast('📤 Mengupload file...', '');
+      const filePath = `submissions/${currentUser.username}/${taskId}_${Date.now()}_${selectedFile.name}`;
+      const storageRef = window._fbStorageRef(window._fbStorage, filePath);
+      const uploadTask = window._fbUpload(storageRef, selectedFile);
+
+      fileURL = await new Promise((resolve, reject) => {
+        uploadTask.on('state_changed',
+          snapshot => {
+            const pct = Math.round(snapshot.bytesTransferred / snapshot.totalBytes * 100);
+            if (submitBtn) submitBtn.textContent = `⏳ Upload ${pct}%...`;
+          },
+          reject,
+          async () => {
+            const url = await window._fbGetDownloadURL(uploadTask.snapshot.ref);
+            resolve(url);
+          }
+        );
+      });
+      fileName = selectedFile.name;
+    } catch(err) {
+      console.error('Upload error:', err);
+      showToast('⚠️ Gagal upload file, tetap mengumpulkan tanpa file', 'warning');
+    }
+  }
+
   const isLate = task && new Date() > new Date(task.deadline);
   const submission = {
     id: Date.now().toString(), taskId,
     studentUsername: currentUser.username, studentName: currentUser.name,
     studentClass: currentUser.class || '-', taskTitle: task ? task.title : taskId,
     subject: task ? task.subject : '-', deadline: task ? task.deadline : '',
-    note, fileName: selectedFile ? selectedFile.name : null,
+    note,
+    fileName: fileName,
+    fileURL: fileURL,
     isLate, source: 'web', submittedAt: new Date().toISOString()
   };
-  await fbSaveSubmission(submission); // Firebase listener auto-updates submissions + UI
+
+  await fbSaveSubmission(submission);
   closeSubmitModal();
+  if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Kumpulkan Sekarang'; }
   showToast('✅ Tugas berhasil dikumpulkan!', 'success');
   if (SheetsAPI.isConnected()) await SheetsAPI.updateStatus(submission);
 }

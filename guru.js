@@ -483,18 +483,101 @@ function renderSubmissions() {
     const task = tasks.find(t => t.id === s.taskId);
     const isLate = task && new Date(s.submittedAt) > new Date(task.deadline);
     const fb = feedbacks.find(f => f.subId === s.id);
+    const hasFile = s.fileURL || s.fileName;
     return `
-      <tr>
+      <tr style="cursor:pointer" onclick="openSubmissionDetail('${s.id}')">
         <td><strong>${s.studentName}</strong> <span style="font-size:.78rem;color:var(--text-muted)">${s.studentClass}</span></td>
         <td data-label="Tugas">${task ? task.title : '-'}</td>
         <td data-label="Mapel">${task ? task.subject : '-'}</td>
         <td data-label="Waktu Kumpul" style="font-size:0.85rem">${formatDate(s.submittedAt)}</td>
         <td data-label="Status">${isLate ? '<span class="badge badge-overdue">Terlambat</span>' : '<span class="badge badge-submitted">Tepat Waktu</span>'}</td>
-        <td data-label="Catatan" style="font-size:0.85rem;color:var(--text-muted)">${s.note || '—'}</td>
-        <td data-label="Feedback">${fb ? `<span class="feedback-chip" onclick="openFeedbackModal('${s.id}')">💬 Edit</span>` : `<span class="feedback-chip" onclick="openFeedbackModal('${s.id}')">+ Feedback</span>`}</td>
+        <td data-label="File">${hasFile ? `<span style="color:var(--primary);font-size:.8rem;font-weight:700">📎 ${s.fileName || 'File'}</span>` : '<span style="color:var(--text-muted);font-size:.8rem">—</span>'}</td>
+        <td data-label="Feedback" onclick="event.stopPropagation()">${fb ? `<span class="feedback-chip" onclick="openFeedbackModal('${s.id}')">💬 Edit</span>` : `<span class="feedback-chip" onclick="openFeedbackModal('${s.id}')">+ Feedback</span>`}</td>
       </tr>`;
   }).join('');
 }
+
+// ===== SUBMISSION DETAIL =====
+function openSubmissionDetail(subId) {
+  const s = submissions.find(s => s.id === subId);
+  if (!s) return;
+  const task = tasks.find(t => t.id === s.taskId);
+  const isLate = task && new Date(s.submittedAt) > new Date(task.deadline);
+  const fb = feedbacks.find(f => f.subId === s.id);
+
+  document.getElementById('submissionDetailContent').innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+      <div style="width:52px;height:52px;border-radius:14px;background:rgba(99,102,241,.2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">🎒</div>
+      <div>
+        <h2 style="font-size:1.15rem;font-weight:800;color:var(--text)">${s.studentName}</h2>
+        <p style="font-size:.82rem;color:var(--text-muted)">${s.studentClass} · ${task ? task.subject : '-'}</p>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+      <div class="task-detail-row">
+        <span class="label">📋 Tugas</span>
+        <span style="font-weight:600">${task ? task.title : s.taskTitle || '-'}</span>
+      </div>
+      <div class="task-detail-row">
+        <span class="label">📅 Tenggat</span>
+        <span>${task ? formatDate(task.deadline) : '-'}</span>
+      </div>
+      <div class="task-detail-row">
+        <span class="label">🕐 Dikumpulkan</span>
+        <span>${formatDate(s.submittedAt)}</span>
+      </div>
+      <div class="task-detail-row">
+        <span class="label">📊 Status</span>
+        <span>${isLate ? '<span class="badge badge-overdue">Terlambat</span>' : '<span class="badge badge-submitted">Tepat Waktu</span>'}</span>
+      </div>
+      ${s.note ? `
+      <div class="task-detail-row" style="align-items:flex-start">
+        <span class="label">📝 Catatan</span>
+        <span style="flex:1;line-height:1.6">${s.note}</span>
+      </div>` : ''}
+      ${fb ? `
+      <div class="task-detail-row" style="align-items:flex-start">
+        <span class="label">💬 Feedback</span>
+        <span style="flex:1;color:var(--primary);font-weight:600">${fb.text}</span>
+      </div>` : ''}
+    </div>
+
+    ${s.fileURL ? `
+    <div style="background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);border-radius:14px;padding:16px;margin-bottom:8px">
+      <div style="font-size:.8rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📎 File Terlampir</div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.fileName || 'File'}</div>
+          <div style="font-size:.75rem;color:var(--text-muted);margin-top:2px">Klik tombol untuk membuka</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0">
+          <a href="${s.fileURL}" target="_blank" rel="noopener"
+             style="padding:9px 16px;background:var(--primary);color:#fff;border-radius:10px;font-size:.82rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:6px">
+            👁️ Buka
+          </a>
+          <a href="${s.fileURL}" download="${s.fileName || 'file'}"
+             style="padding:9px 16px;background:rgba(255,255,255,.1);color:var(--text);border:1px solid var(--border);border-radius:10px;font-size:.82rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:6px">
+            ⬇️ Download
+          </a>
+        </div>
+      </div>
+    </div>` : `
+    <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;text-align:center;color:var(--text-muted);font-size:.85rem">
+      📭 Tidak ada file yang dilampirkan
+    </div>`}
+  `;
+
+  document.getElementById('submissionDetailActions').innerHTML = `
+    <button class="btn btn-secondary" onclick="closeSubmissionDetail()">Tutup</button>
+    <button class="btn btn-primary" onclick="closeSubmissionDetail();openFeedbackModal('${subId}')">
+      ${fb ? '✏️ Edit Feedback' : '💬 Beri Feedback'}
+    </button>
+  `;
+
+  document.getElementById('submissionDetailModal').classList.add('open');
+}
+function closeSubmissionDetail() { closeModalAnimated('submissionDetailModal'); }
 
 // ===== FEEDBACK =====
 function openFeedbackModal(subId) {
@@ -771,7 +854,7 @@ function showToast(msg, type = '') {
 }
 function logout() { sessionStorage.removeItem('user'); window.location.href = 'index.html'; }
 
-['addTaskModal','taskDetailModal','feedbackModal'].forEach(id => {
+['addTaskModal','taskDetailModal','feedbackModal','submissionDetailModal'].forEach(id => {
   const el = document.getElementById(id);
   if (el) el.addEventListener('click', function(e) {
     if (e.target === this) closeModalAnimated(id);

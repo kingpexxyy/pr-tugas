@@ -176,7 +176,7 @@
       </div>
       <div class="table-container">
         <table>
-          <thead><tr><th>Siswa</th><th>Kelas</th><th>Tugas</th><th>Mapel</th><th>Waktu Kumpul</th><th>Status</th><th>Catatan</th><th>Feedback</th></tr></thead>
+          <thead><tr><th>Siswa</th><th>Kelas</th><th>Tugas</th><th>Mapel</th><th>Waktu Kumpul</th><th>Status</th><th>File</th><th>Feedback</th></tr></thead>
           <tbody id="submissionTableBody"></tbody>
         </table>
       </div>
@@ -293,11 +293,20 @@
   </div>
 </div>
 
+<!-- Modal Detail Submission -->
+<div class="modal-overlay" id="submissionDetailModal">
+  <div class="modal modal-wide">
+    <div id="submissionDetailContent"></div>
+    <div class="modal-actions" id="submissionDetailActions"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 <script src="sheets.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, set, remove, onValue, push, get, onDisconnect, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getStorage, ref as sRef, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 const _app = initializeApp({
   apiKey:"AIzaSyA-Y0tDvkRx2AErra1obZ6IG9PoLfrRVUA",
   authDomain:"tugas-68ece.firebaseapp.com",
@@ -308,6 +317,7 @@ const _app = initializeApp({
   appId:"1:984169338910:web:1d068db6eefda034a0360f"
 });
 const _db = getDatabase(_app);
+const _storage = getStorage(_app);
 window._fbDB = _db;
 window._fbRef = ref;
 window._fbSet = set;
@@ -317,6 +327,9 @@ window._fbPush = push;
 window._fbGet = get;
 window._fbOnDisconnect = onDisconnect;
 window._fbServerTimestamp = serverTimestamp;
+window._fbStorage = _storage;
+window._fbStorageRef = sRef;
+window._fbGetDownloadURL = getDownloadURL;
 // Signal that Firebase is ready
 window._fbReady = true;
 document.dispatchEvent(new Event('firebase-ready'));

@@ -1,0 +1,12 @@
+// Paste ini ke Firebase Console → Storage → Rules
+// https://console.firebase.google.com → project tugas → Storage → Rules
+
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /submissions/{allPaths=**} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+}
