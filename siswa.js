@@ -429,6 +429,7 @@ function openTaskDetail(id) {
   const isSubmitted = mySubmissions.some(s => s.taskId === id);
   const mySub = mySubmissions.find(s => s.taskId === id);
   const color = SUBJ_COLORS[t.subject] || '#6366f1';
+  // Baca feedbacks dari Firebase cache (localStorage) — sudah di-update oleh listener
   const feedbacks = JSON.parse(localStorage.getItem('feedbacks') || '[]');
   const fb = mySub ? feedbacks.find(f => f.subId === mySub.id) : null;
 
@@ -457,7 +458,19 @@ function openTaskDetail(id) {
       ${isSubmitted && mySub ? `
         <div class="task-detail-row"><span class="label">🕐 Dikumpulkan</span><span>${formatDate(mySub.submittedAt)}</span></div>
         ${mySub.note ? `<div class="task-detail-row"><span class="label">📝 Catatanmu</span><span>${mySub.note}</span></div>` : ''}
-        ${fb ? `<div class="task-detail-row"><span class="label">💬 Feedback Guru</span><span style="color:var(--primary);font-weight:600">${fb.text}</span></div>` : ''}
+        ${mySub.fileURL ? `<div class="task-detail-row"><span class="label">📎 File Kamu</span><span><a href="${mySub.fileURL}" target="_blank" rel="noopener noreferrer" style="color:var(--primary);font-weight:700;text-decoration:none">${mySub.fileName||'Lihat file'}</a></span></div>` : ''}
+        ${fb ? `
+        <div class="task-detail-row" style="align-items:flex-start">
+          <span class="label">💬 Feedback</span>
+          <div style="flex:1">
+            <div style="color:var(--primary);font-weight:600;margin-bottom:4px">${fb.text}</div>
+            ${fb.attachmentURL ? `
+            <a href="${fb.attachmentURL}" target="_blank" rel="noopener noreferrer"
+               style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);border-radius:8px;color:var(--primary);font-size:.78rem;font-weight:700;text-decoration:none;margin-top:4px">
+              📎 ${fb.attachmentName||'Lampiran koreksi'} — Buka
+            </a>` : ''}
+          </div>
+        </div>` : ''}
       ` : ''}
     </div>
     <p style="font-size:0.82rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Deskripsi Tugas</p>
@@ -830,7 +843,10 @@ function renderRiwayat() {
       ? `<a href="${s.fileURL}" target="_blank" rel="noopener noreferrer" style="color:var(--primary);font-size:.78rem;font-weight:700;text-decoration:none">📎 ${s.fileName||'File'}</a>`
       : '<span style="color:var(--text-muted);font-size:.8rem">—</span>';
     const fbChip = fb
-      ? `<div style="font-size:.8rem;color:var(--text-muted)">💬 ${fb.text}${fb.attachmentURL ? ` <a href="${fb.attachmentURL}" target="_blank" rel="noopener noreferrer" style="color:var(--primary);font-weight:700;text-decoration:none">📎</a>` : ''}</div>`
+      ? `<div style="font-size:.8rem">
+           <span style="color:var(--primary);font-weight:600">💬 ${fb.text}</span>
+           ${fb.attachmentURL ? `<br><a href="${fb.attachmentURL}" target="_blank" rel="noopener noreferrer" style="color:var(--primary);font-size:.75rem;font-weight:700;text-decoration:none">📎 ${fb.attachmentName||'Lampiran'}</a>` : ''}
+         </div>`
       : '<span style="color:var(--text-muted);font-size:.8rem">—</span>';
     return `<tr>
       <td><strong>${task ? task.title : s.taskTitle || 'Tugas dihapus'}</strong></td>
