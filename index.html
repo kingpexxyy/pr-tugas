@@ -8,272 +8,130 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-
     body {
       font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui;
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #0f0c29;
-      overflow: hidden;
-      position: relative;
-    }
-
-    /* ── Animated gradient background ── */
-    .bg-gradient {
-      position: fixed;
-      inset: 0;
-      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-      background-size: 400% 400%;
-      animation: gradientShift 8s ease infinite;
-      z-index: 0;
-    }
-    @keyframes gradientShift {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    /* ── Floating orbs ── */
-    .orb {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: .35;
-      animation: orbFloat linear infinite;
-      z-index: 0;
-      pointer-events: none;
-    }
-    .orb-1 { width:500px; height:500px; background:#6366f1; top:-150px; right:-100px; animation-duration:20s; }
-    .orb-2 { width:400px; height:400px; background:#8b5cf6; bottom:-100px; left:-80px; animation-duration:25s; animation-delay:-8s; }
-    .orb-3 { width:300px; height:300px; background:#06b6d4; top:40%; left:30%; animation-duration:18s; animation-delay:-4s; }
-    @keyframes orbFloat {
-      0%,100% { transform: translate(0,0) scale(1); }
-      33%     { transform: translate(30px,-40px) scale(1.05); }
-      66%     { transform: translate(-20px,20px) scale(.95); }
-    }
-
-    /* ── Particles ── */
-    .particles { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
-    .particle {
-      position: absolute;
-      width: 3px; height: 3px;
-      background: rgba(255,255,255,.6);
-      border-radius: 50%;
-      animation: particleFall linear infinite;
-    }
-    @keyframes particleFall {
-      0%   { transform: translateY(-10px) translateX(0); opacity:0; }
-      10%  { opacity:1; }
-      90%  { opacity:.5; }
-      100% { transform: translateY(100vh) translateX(40px); opacity:0; }
-    }
-
-    /* ── Card ── */
-    .card {
-      position: relative;
-      z-index: 10;
-      background: rgba(255,255,255,.08);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(255,255,255,.15);
-      border-radius: 28px;
-      padding: 44px 40px;
-      width: 100%;
-      max-width: 420px;
-      box-shadow: 0 32px 80px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.2);
-      animation: cardEntrance .7s cubic-bezier(.34,1.56,.64,1) both;
-    }
-    @keyframes cardEntrance {
-      from { opacity:0; transform:translateY(40px) scale(.92); }
-      to   { opacity:1; transform:translateY(0) scale(1); }
-    }
-
-    /* ── Logo ── */
-    .logo-wrap {
-      text-align: center;
-      margin-bottom: 32px;
-      animation: fadeSlideDown .6s cubic-bezier(.16,1,.3,1) .15s both;
-    }
-    @keyframes fadeSlideDown {
-      from { opacity:0; transform:translateY(-16px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
-    .logo-icon {
-      width: 68px; height: 68px;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      border-radius: 20px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 2rem;
-      margin: 0 auto 14px;
-      box-shadow: 0 8px 32px rgba(99,102,241,.5);
-      animation: logoPulse 3s ease-in-out infinite;
+      background: #0f0c29;
+      overflow-y: auto; overflow-x: hidden;
+      position: relative;
+      padding: 20px 16px;
     }
-    @keyframes logoPulse {
-      0%,100% { box-shadow: 0 8px 32px rgba(99,102,241,.5); transform: scale(1); }
-      50%     { box-shadow: 0 12px 48px rgba(99,102,241,.7); transform: scale(1.04); }
+    .bg-gradient { position:fixed; inset:0; background:linear-gradient(135deg,#0f0c29,#302b63,#24243e); background-size:400% 400%; animation:gradientShift 8s ease infinite; z-index:0; }
+    @keyframes gradientShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+    .orb { position:fixed; border-radius:50%; filter:blur(80px); opacity:.35; animation:orbFloat linear infinite; z-index:0; pointer-events:none; }
+    .orb-1 { width:500px;height:500px;background:#6366f1;top:-150px;right:-100px;animation-duration:20s; }
+    .orb-2 { width:400px;height:400px;background:#8b5cf6;bottom:-100px;left:-80px;animation-duration:25s;animation-delay:-8s; }
+    .orb-3 { width:300px;height:300px;background:#06b6d4;top:40%;left:30%;animation-duration:18s;animation-delay:-4s; }
+    @keyframes orbFloat { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(30px,-40px) scale(1.05)} 66%{transform:translate(-20px,20px) scale(.95)} }
+    .particles { position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden; }
+    .particle { position:absolute;width:3px;height:3px;background:rgba(255,255,255,.6);border-radius:50%;animation:particleFall linear infinite; }
+    @keyframes particleFall { 0%{transform:translateY(-10px) translateX(0);opacity:0} 10%{opacity:1} 90%{opacity:.5} 100%{transform:translateY(100vh) translateX(40px);opacity:0} }
+
+    .card {
+      position:relative; z-index:10;
+      background:rgba(255,255,255,.08);
+      backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+      border:1px solid rgba(255,255,255,.15);
+      border-radius:28px; padding:40px 36px;
+      width:100%; max-width:420px;
+      box-shadow:0 32px 80px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.2);
+      animation:cardEntrance .7s cubic-bezier(.34,1.56,.64,1) both;
     }
-    .logo-title { font-size: 1.75rem; font-weight: 800; color: #fff; letter-spacing: -.5px; }
-    .logo-sub   { color: rgba(255,255,255,.55); font-size: .88rem; margin-top: 4px; }
+    @keyframes cardEntrance { from{opacity:0;transform:translateY(40px) scale(.92)} to{opacity:1;transform:translateY(0) scale(1)} }
+
+    .logo-wrap { text-align:center; margin-bottom:28px; }
+    .logo-icon { width:64px;height:64px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:1.9rem;margin:0 auto 12px;box-shadow:0 8px 32px rgba(99,102,241,.5);animation:logoPulse 3s ease-in-out infinite; }
+    @keyframes logoPulse { 0%,100%{box-shadow:0 8px 32px rgba(99,102,241,.5);transform:scale(1)} 50%{box-shadow:0 12px 48px rgba(99,102,241,.7);transform:scale(1.04)} }
+    .logo-title { font-size:1.7rem;font-weight:800;color:#fff;letter-spacing:-.5px; }
+    .logo-sub { color:rgba(255,255,255,.55);font-size:.85rem;margin-top:4px; }
+
+    /* ── Mode tabs (Login / Daftar) ── */
+    .mode-tabs {
+      display:flex; background:rgba(255,255,255,.06);
+      border-radius:14px; padding:4px; margin-bottom:20px; gap:4px;
+    }
+    .mode-tab {
+      flex:1; padding:10px; border:none; background:transparent;
+      border-radius:11px; cursor:pointer; font-size:.88rem; font-weight:600;
+      color:rgba(255,255,255,.45); transition:all .25s cubic-bezier(.34,1.56,.64,1);
+      font-family:inherit;
+    }
+    .mode-tab.active { background:rgba(255,255,255,.18); color:#fff; box-shadow:0 2px 12px rgba(0,0,0,.2); transform:scale(1.02); }
 
     /* ── Role tabs ── */
-    .role-tabs {
-      display: flex;
-      background: rgba(255,255,255,.08);
-      border-radius: 14px;
-      padding: 4px;
-      margin-bottom: 28px;
-      gap: 4px;
-      animation: fadeSlideDown .6s cubic-bezier(.16,1,.3,1) .25s both;
-    }
-    .role-tab {
-      flex: 1; padding: 11px;
-      border: none; background: transparent;
-      border-radius: 11px; cursor: pointer;
-      font-size: .9rem; font-weight: 600;
-      color: rgba(255,255,255,.5);
-      transition: all .25s cubic-bezier(.34,1.56,.64,1);
-      font-family: inherit;
-    }
-    .role-tab.active {
-      background: rgba(255,255,255,.18);
-      color: #fff;
-      box-shadow: 0 2px 12px rgba(0,0,0,.2);
-      transform: scale(1.02);
-    }
+    .role-tabs { display:flex; background:rgba(255,255,255,.06); border-radius:12px; padding:3px; margin-bottom:20px; gap:3px; }
+    .role-tab { flex:1;padding:9px;border:none;background:transparent;border-radius:10px;cursor:pointer;font-size:.85rem;font-weight:600;color:rgba(255,255,255,.45);transition:all .2s;font-family:inherit; }
+    .role-tab.active { background:rgba(255,255,255,.15);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2); }
 
-    /* ── Form ── */
-    .form-wrap { animation: fadeSlideDown .6s cubic-bezier(.16,1,.3,1) .35s both; }
-    .field { margin-bottom: 18px; }
-    .field label {
-      display: block;
-      font-size: .72rem; font-weight: 700;
-      color: rgba(255,255,255,.5);
-      text-transform: uppercase; letter-spacing: .6px;
-      margin-bottom: 8px;
-    }
+    .field { margin-bottom:16px; }
+    .field label { display:block;font-size:.7rem;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px; }
     .field input {
-      width: 100%;
-      padding: 13px 16px;
-      background: rgba(255,255,255,.08);
-      border: 1.5px solid rgba(255,255,255,.15);
-      border-radius: 14px;
-      font-size: 16px; /* prevent iOS zoom */
-      color: #fff;
-      outline: none;
-      font-family: inherit;
-      transition: all .25s cubic-bezier(.16,1,.3,1);
+      width:100%; padding:12px 15px;
+      background:rgba(255,255,255,.08); border:1.5px solid rgba(255,255,255,.15);
+      border-radius:13px; font-size:16px; color:#fff; outline:none;
+      font-family:inherit; transition:all .2s;
     }
-    .field input::placeholder { color: rgba(255,255,255,.3); }
-    .field input:focus {
-      border-color: rgba(99,102,241,.8);
-      background: rgba(255,255,255,.12);
-      box-shadow: 0 0 0 4px rgba(99,102,241,.2);
-      transform: scale(1.005);
-    }
+    .field input::placeholder { color:rgba(255,255,255,.3); }
+    .field input:focus { border-color:rgba(99,102,241,.8); background:rgba(255,255,255,.12); box-shadow:0 0 0 3px rgba(99,102,241,.2); }
 
-    /* ── Error ── */
-    #errorMsg {
-      color: #fca5a5;
-      font-size: .82rem;
-      text-align: center;
-      margin-bottom: 12px;
-      animation: shake .4s cubic-bezier(.36,.07,.19,.97);
-    }
-    @keyframes shake {
-      0%,100% { transform:translateX(0); }
-      20%     { transform:translateX(-8px); }
-      40%     { transform:translateX(8px); }
-      60%     { transform:translateX(-5px); }
-      80%     { transform:translateX(5px); }
-    }
+    .field-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
-    /* ── Submit button ── */
+    #errorMsg { color:#fca5a5;font-size:.8rem;text-align:center;margin-bottom:10px; }
+    #successMsg { color:#6ee7b7;font-size:.8rem;text-align:center;margin-bottom:10px; }
+
     .btn-submit {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, #6366f1, #4f46e5);
-      color: #fff;
-      border: none;
-      border-radius: 14px;
-      font-size: .95rem; font-weight: 700;
-      cursor: pointer;
-      font-family: inherit;
-      box-shadow: 0 6px 24px rgba(99,102,241,.45);
-      transition: all .25s cubic-bezier(.34,1.56,.64,1);
-      position: relative;
-      overflow: hidden;
+      width:100%; padding:13px;
+      background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff;
+      border:none; border-radius:13px; font-size:.93rem; font-weight:700;
+      cursor:pointer; font-family:inherit;
+      box-shadow:0 6px 24px rgba(99,102,241,.45);
+      transition:all .25s cubic-bezier(.34,1.56,.64,1);
     }
-    .btn-submit::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,.15), transparent);
-      opacity: 0;
-      transition: opacity .2s;
-    }
-    .btn-submit:hover {
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 10px 32px rgba(99,102,241,.55);
-    }
-    .btn-submit:hover::after { opacity: 1; }
-    .btn-submit:active { transform: scale(.96); transition-duration: .08s; }
-    .btn-submit.loading { pointer-events: none; opacity: .8; }
-    .btn-submit.loading::before {
-      content: '';
-      display: inline-block;
-      width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,.4);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin .6s linear infinite;
-      margin-right: 8px;
-      vertical-align: middle;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn-submit:hover { transform:translateY(-2px) scale(1.02); box-shadow:0 10px 32px rgba(99,102,241,.55); }
+    .btn-submit:active { transform:scale(.96); }
+    .btn-submit.loading { pointer-events:none; opacity:.8; }
+    .btn-submit.loading::before { content:''; display:inline-block; width:14px;height:14px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:spin .6s linear infinite; margin-right:8px; vertical-align:middle; }
+    @keyframes spin { to{transform:rotate(360deg)} }
 
-    /* ── Footer hint ── */
-    .hint {
-      text-align: center;
-      margin-top: 20px;
-      font-size: .75rem;
-      color: rgba(255,255,255,.3);
-      animation: fadeSlideDown .6s cubic-bezier(.16,1,.3,1) .45s both;
-    }
+    .hint { text-align:center;margin-top:16px;font-size:.72rem;color:rgba(255,255,255,.3); }
+    .hint a { color:rgba(255,255,255,.5);cursor:pointer;text-decoration:underline; }
 
-    /* ── Mobile ── */
-    @media(max-width:480px) {
-      .card { padding: 32px 24px; border-radius: 24px; }
-      .logo-title { font-size: 1.5rem; }
-    }
+    .divider { display:flex;align-items:center;gap:10px;margin:16px 0; }
+    .divider::before,.divider::after { content:'';flex:1;height:1px;background:rgba(255,255,255,.1); }
+    .divider span { font-size:.72rem;color:rgba(255,255,255,.3);white-space:nowrap; }
+
+    @media(max-width:480px) { .card{padding:28px 20px;border-radius:22px;} .field-row{grid-template-columns:1fr;} }
   </style>
 </head>
 <body>
-
   <div class="bg-gradient"></div>
-
-  <!-- Floating orbs -->
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
   <div class="orb orb-3"></div>
-
-  <!-- Particles -->
   <div class="particles" id="particles"></div>
 
-  <!-- Card -->
-  <div class="card">
+  <div class="card" id="mainCard">
     <div class="logo-wrap">
       <div class="logo-icon">📚</div>
       <div class="logo-title">TugasKu</div>
       <div class="logo-sub">Platform Pengumpulan Tugas Digital</div>
     </div>
 
+    <!-- Mode: Login / Daftar -->
+    <div class="mode-tabs">
+      <button class="mode-tab active" id="modeLogin" onclick="switchMode('login')">Masuk</button>
+      <button class="mode-tab" id="modeDaftar" onclick="switchMode('daftar')">Daftar</button>
+    </div>
+
+    <!-- Role tabs -->
     <div class="role-tabs">
       <button id="tabSiswa" class="role-tab active" onclick="setRole('siswa')">🎒 Siswa</button>
       <button id="tabGuru"  class="role-tab"        onclick="setRole('guru')">👨‍🏫 Guru</button>
     </div>
 
-    <div class="form-wrap">
+    <!-- LOGIN FORM -->
+    <div id="loginSection">
       <form id="loginForm" onsubmit="handleLogin(event)">
         <div class="field">
           <label>Username</label>
@@ -286,27 +144,88 @@
         <div id="errorMsg" style="display:none"></div>
         <button type="submit" class="btn-submit" id="submitBtn">Masuk</button>
       </form>
+      <p class="hint">Belum punya akun? <a onclick="switchMode('daftar')">Daftar sekarang</a></p>
     </div>
 
-    <p class="hint">Demo: guru1/guru123 · siswa1/siswa123</p>
+    <!-- REGISTER FORM -->
+    <div id="registerSection" style="display:none">
+      <form id="registerForm" onsubmit="handleRegister(event)">
+        <div class="field">
+          <label>Nama Lengkap</label>
+          <input type="text" id="regName" placeholder="Nama kamu" required>
+        </div>
+        <div class="field-row">
+          <div class="field" style="margin:0">
+            <label>Username</label>
+            <input type="text" id="regUsername" placeholder="username" autocomplete="off" required>
+          </div>
+          <div class="field" id="regClassField" style="margin:0">
+            <label>Kelas</label>
+            <input type="text" id="regClass" placeholder="Contoh: X-A">
+          </div>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="regPassword" placeholder="Min. 6 karakter" required minlength="6">
+        </div>
+        <div class="field">
+          <label>Konfirmasi Password</label>
+          <input type="password" id="regPasswordConfirm" placeholder="Ulangi password" required>
+        </div>
+        <div id="regErrorMsg" style="display:none;color:#fca5a5;font-size:.8rem;text-align:center;margin-bottom:10px"></div>
+        <div id="regSuccessMsg" style="display:none;color:#6ee7b7;font-size:.8rem;text-align:center;margin-bottom:10px"></div>
+        <button type="submit" class="btn-submit" id="regBtn">Buat Akun</button>
+      </form>
+      <p class="hint">Sudah punya akun? <a onclick="switchMode('login')">Masuk</a></p>
+    </div>
   </div>
 
+  <!-- Firebase untuk simpan akun baru -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    const _app = initializeApp({
+      apiKey:"AIzaSyA-Y0tDvkRx2AErra1obZ6IG9PoLfrRVUA",
+      authDomain:"tugas-68ece.firebaseapp.com",
+      databaseURL:"https://tugas-68ece-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId:"tugas-68ece",
+      storageBucket:"tugas-68ece.firebasestorage.app",
+      messagingSenderId:"984169338910",
+      appId:"1:984169338910:web:1d068db6eefda034a0360f"
+    });
+    const _db = getDatabase(_app);
+    window._fbDB = _db;
+    window._fbRef = ref;
+    window._fbSet = set;
+    window._fbGet = get;
+    window._fbReady = true;
+  </script>
+
   <script>
-    // ── Particles ──
+    // Particles
     const container = document.getElementById('particles');
     for (let i = 0; i < 40; i++) {
       const p = document.createElement('div');
       p.className = 'particle';
-      p.style.cssText = `
-        left: ${Math.random()*100}%;
-        top: ${Math.random()*100}%;
-        width: ${Math.random()*3+1}px;
-        height: ${Math.random()*3+1}px;
-        animation-duration: ${Math.random()*15+8}s;
-        animation-delay: ${Math.random()*10}s;
-        opacity: ${Math.random()*.6+.2};
-      `;
+      p.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;width:${Math.random()*3+1}px;height:${Math.random()*3+1}px;animation-duration:${Math.random()*15+8}s;animation-delay:${Math.random()*10}s;opacity:${Math.random()*.6+.2}`;
       container.appendChild(p);
+    }
+
+    let currentMode = 'login';
+
+    function switchMode(mode) {
+      currentMode = mode;
+      document.getElementById('loginSection').style.display = mode === 'login' ? 'block' : 'none';
+      document.getElementById('registerSection').style.display = mode === 'daftar' ? 'block' : 'none';
+      document.getElementById('modeLogin').classList.toggle('active', mode === 'login');
+      document.getElementById('modeDaftar').classList.toggle('active', mode === 'daftar');
+      // Kelas hanya untuk siswa
+      updateClassField();
+    }
+
+    function updateClassField() {
+      const classField = document.getElementById('regClassField');
+      if (classField) classField.style.display = selectedRole === 'siswa' ? 'block' : 'none';
     }
   </script>
   <script src="auth.js"></script>
